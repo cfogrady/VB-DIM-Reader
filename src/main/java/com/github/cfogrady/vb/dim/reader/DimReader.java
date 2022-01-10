@@ -2,38 +2,51 @@ package com.github.cfogrady.vb.dim.reader;
 
 
 import com.github.cfogrady.vb.dim.reader.content.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 
+@Slf4j
 public class DimReader {
     public DimContent readDimData(InputStream inputStream, boolean strictEmulation) {
         if(strictEmulation) {
-            return readDimData(inputStream, 17, 15, 1);
+            return readDimData(inputStream, 17, 15, 1, true);
         } else {
-            return readDimData(inputStream, null, null, null);
+            return readDimData(inputStream, null, null, null, false);
         }
     }
 
-    public DimContent readDimData(InputStream inputStream, Integer maxStatSlots, Integer maxAdventures, Integer maxDimSpecificFusions) {
+    public DimContent readDimData(InputStream inputStream, Integer maxStatSlots, Integer maxAdventures, Integer maxDimSpecificFusions, boolean verifyChecksum) {
         ChecksumBuilder checksumBuilder = new ChecksumBuilder();
         try {
-            byte[] bytes = ByteUtils.applyNotOperation(inputStream.readNBytes(0x102F));
-            DimHeader header = DimHeader.dimHeaderFromBytes(bytes, checksumBuilder);
-            inputStream.readNBytes(0x30000 - 0x102F); // skip everything until stats section
-            bytes = ByteUtils.applyNotOperation(inputStream.readNBytes(0x40000 - 0x30000));
-            DimStats stats = DimStats.dimStatsFromBytes(bytes, checksumBuilder, maxStatSlots);
-            bytes = ByteUtils.applyNotOperation(inputStream.readNBytes(0x50000 - 0x40000));
-            DimEvolutionRequirements evolutionRequirements = DimEvolutionRequirements.dimEvolutionRequirementsFromBytes(bytes, checksumBuilder);
-            bytes = ByteUtils.applyNotOperation(inputStream.readNBytes(0x60000 - 0x50000));
-            DimAdventures adventures = DimAdventures.dimAdventuresFromBytes(bytes, checksumBuilder, maxAdventures);
-            byte[] spriteDimensions = ByteUtils.applyNotOperation(inputStream.readNBytes(0x70000 - 0x60000));
-            bytes = ByteUtils.applyNotOperation(inputStream.readNBytes(0x80000 - 0x70000));
-            DimFusions fusions = DimFusions.dimFusionsFromBytes(bytes, checksumBuilder);
-            bytes = ByteUtils.applyNotOperation(inputStream.readNBytes(0x100000 - 0x80000));
-            DimSpecificFusions dimSpecificFusions = DimSpecificFusions.dimSpecificFusionsFromBytes(bytes, checksumBuilder, maxDimSpecificFusions);
-            SpriteData spriteData = SpriteData.spriteDataFromBytesAndStream(spriteDimensions, inputStream, checksumBuilder);
+            InputStreamWithNot inputStreamWithNot = InputStreamWithNot.wrap(inputStream, checksumBuilder);
+            byte[] bytes = inputStreamWithNot.readNBytes(0x1030);
+            DimHeader header = DimHeaderReader.dimHeaderFromBytes(bytes);
+            inputStreamWithNot.readToOffset(0x30000); // skip everything until stats section
+            bytes = inputStreamWithNot.readToOffset(0x40000);
+            DimStats stats = DimStatsReader.dimStatsFromBytes(bytes, maxStatSlots);
+            bytes = inputStreamWithNot.readToOffset(0x50000);
+            DimEvolutionRequirements evolutionRequirements = DimEvolutionsReader.dimEvolutionRequirementsFromBytes(bytes);
+            bytes = inputStreamWithNot.readToOffset(0x60000);
+            DimAdventures adventures = DimAdventuresReader.dimAdventuresFromBytes(bytes, maxAdventures);
+            byte[] spriteDimensions = inputStreamWithNot.readToOffset(0x70000);
+            bytes = inputStreamWithNot.readToOffset(0x80000);
+            DimFusions fusions = DimFusionsReader.dimFusionsFromBytes(bytes);
+            bytes = inputStreamWithNot.readToOffset(0x100000);
+            DimSpecificFusions dimSpecificFusions = DimSpecificFusionsReader.dimSpecificFusionsFromBytes(bytes, maxDimSpecificFusions);
+            SpriteData spriteData = DimSpritesReader.spriteDataFromBytesAndStream(spriteDimensions, inputStreamWithNot);
+            inputStreamWithNot.readToOffset(0x3FFFFE);
+            bytes = inputStreamWithNot.readNBytes(2);
+            int dimChecksum = ByteUtils.getUnsigned16Bit(bytes)[0];
+            int calculatedChecksum = checksumBuilder.getCheckSum();
+            if(dimChecksum != calculatedChecksum) {
+                log.warn("Checksums don't match!");
+                if(verifyChecksum) {
+                    throw new IllegalStateException("Invalid Dim. Calculated checksum doesn't match Dim checksum");
+                }
+            }
             return DimContent.builder()
                     .dimHeader(header)
                     .dimStats(stats)
@@ -42,7 +55,7 @@ public class DimReader {
                     .dimFusions(fusions)
                     .dimSpecificFusion(dimSpecificFusions)
                     .spriteData(spriteData)
-                    .checksum(checksumBuilder.getCheckSum())
+                    .checksum(dimChecksum)
                     .build();
         } catch (IOException ioe) {
             throw new UncheckedIOException(ioe);

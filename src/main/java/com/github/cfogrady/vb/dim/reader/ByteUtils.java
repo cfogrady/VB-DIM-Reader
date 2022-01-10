@@ -7,16 +7,25 @@ import at.favre.lib.bytes.Bytes;
 
 public class ByteUtils {
     public static int[] getUnsigned16Bit(byte[] bytes) {
-        short[] signedValues = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().array();
-        int[] values = new int[signedValues.length];
-        for(int i = 0; i < signedValues.length; i++) {
-            values[i] = signedValues[i] >= 0 ? signedValues[i] : signedValues[i] + 0x10000;
+        if(bytes.length % 2 != 0) {
+            throw new IllegalArgumentException("Number of bytes must be multiple of 2 to convert into 16-bit words");
+        }
+        char[] unsignedValues = new char[bytes.length/2];
+        ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).asCharBuffer().get(unsignedValues);
+        int[] values = new int[unsignedValues.length];
+        for(int i = 0; i < unsignedValues.length; i++) {
+            values[i] = unsignedValues[i];
         }
         return values;
     }
 
     public static int[] getIntsFromBytes(byte[] bytes) {
-        return ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).asIntBuffer().array();
+        if(bytes.length % 4 != 0) {
+            throw new IllegalArgumentException("Number of bytes must be multiple of 4 to convert into 32-bit words");
+        }
+        int[] values = new int[bytes.length/4];
+        ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).asIntBuffer().get(values);
+        return values;
     }
 
     public static byte[] applyNotOperation(byte[] bytes) {
