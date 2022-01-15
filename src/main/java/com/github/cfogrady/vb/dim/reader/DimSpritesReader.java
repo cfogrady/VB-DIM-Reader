@@ -1,11 +1,13 @@
 package com.github.cfogrady.vb.dim.reader;
 
 import com.github.cfogrady.vb.dim.reader.content.SpriteData;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 class DimSpritesReader {
     static SpriteData spriteDataFromBytesAndStream(byte[] spriteDimensionBytes, InputStreamWithNot spriteDataSection) throws IOException {
         int[] spriteDimensions = ByteUtils.getUnsigned16Bit(spriteDimensionBytes);
@@ -14,6 +16,8 @@ class DimSpritesReader {
         spriteDataSection.readNBytes(0x48 - 0x1c);
         int numberOfSprites = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes(4))[0];
         int[] spriteOffsets = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes(numberOfSprites*4));
+        int oneMore = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes(4))[0];
+        log.info("Bytes between final offset and sprites: {} - {}", oneMore, Integer.toHexString(oneMore));
         List<SpriteData.Sprite> sprites = new ArrayList<>(numberOfSprites);
         int currentOffset = spriteOffsets[0];
         for(int i = 0; i < numberOfSprites; i++)

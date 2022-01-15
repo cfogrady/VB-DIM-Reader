@@ -9,7 +9,11 @@
 plugins {
     // Apply the java-library plugin for API and implementation separation.
     id 'java-library'
+    id "io.toolebox.git-versioner" version "1.6.5"
+    id 'maven-publish'
 }
+
+group 'com.github.cfogrady'
 
 repositories {
     mavenCentral()
@@ -30,12 +34,30 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:1.7.32'
     testImplementation 'org.slf4j:slf4j-simple:1.7.32'
 
+    implementation 'at.favre.lib:bytes:1.5.0'
+
 
     // Use JUnit test framework.
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 }
 
+versioner {
+    pattern {
+        pattern = "%M.%m.%p.(%c-%h)"
+    }
+}
+
 test {
     useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId 'com.github.cfogrady'
+            artifactId 'vb-dim-reader'
+            from components.java
+        }
+    }
 }

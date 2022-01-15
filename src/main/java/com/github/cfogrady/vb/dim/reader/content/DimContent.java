@@ -13,5 +13,6 @@ public class DimContent {
 	private final DimFusions dimFusions;
 	private final DimSpecificFusions dimSpecificFusion;
 	private final int checksum;
+	private final int calculatedCheckSum;
 	private final SpriteData spriteData;
 }

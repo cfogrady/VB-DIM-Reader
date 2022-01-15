@@ -13,11 +13,11 @@ public class SpriteData {
 	@Builder(toBuilder=true)
 	@Data
 	public static class Sprite {
-		public final int width;
-		public final int height;
-		byte[] pixelData; //16-bit R5G6B5
+		private final int width;
+		private final int height;
+		private final byte[] pixelData; //16-bit R5G6B5
 
-		byte[] get24BitRGB() {
+		public byte[] get24BitRGB() {
 			byte[] rgb = new byte[(pixelData.length/2)*3];
 			for(int pixel = 0; pixel < width*height; pixel++) {
 				int red = (pixelData[pixel*2 + 1] & 0b11111000) >> 3;
@@ -29,6 +29,31 @@ public class SpriteData {
 				rgb[pixel*3 + 2] = (byte) scaleTo24BitColor(blue, 5);
 			}
 			return rgb;
+		}
+
+		public byte[] getBGRA() {
+			byte[] bgra = new byte[(pixelData.length/2)*4];
+			for(int pixel = 0; pixel < width*height; pixel++) {
+				int byte0 = pixelData[pixel*2+1] & 0xFF;
+				int byte1 = pixelData[pixel*2] & 0xFF;
+				int red = (byte0 & 0b11111000) >> 3;
+				int blue = byte1 & 0b00011111;
+				int green = ((byte0 & 0b00000111) << 3) |
+						((byte1 & 0b11100000) >> 5);
+				red = scaleTo24BitColor(red, 5);
+				green = scaleTo24BitColor(green, 6);
+				blue = scaleTo24BitColor(blue, 5);
+				int alpha = 255;
+				if(red == 0 && blue == 0 && green == 255) {
+					alpha = 0;
+					green = 0;
+				}
+				bgra[pixel*4+0] = (byte) blue; // blue
+				bgra[pixel*4+1] = (byte) green;// green
+				bgra[pixel*4+2] = (byte) red; // red
+				bgra[pixel*4+3] = (byte) alpha;
+			}
+			return bgra;
 		}
 	}
 	

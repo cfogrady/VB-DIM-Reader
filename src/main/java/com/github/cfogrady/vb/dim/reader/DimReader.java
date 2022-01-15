@@ -56,6 +56,7 @@ public class DimReader {
                     .dimSpecificFusion(dimSpecificFusions)
                     .spriteData(spriteData)
                     .checksum(dimChecksum)
+                    .calculatedCheckSum(calculatedChecksum)
                     .build();
         } catch (IOException ioe) {
             throw new UncheckedIOException(ioe);
