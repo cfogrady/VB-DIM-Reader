@@ -11,7 +11,7 @@ class DimEvolutionsReader {
         int[] values = ByteUtils.getUnsigned16Bit(bytes);
         boolean onlyZeroRow = false;
         for(int index = 0; index < values.length-12 && !onlyZeroRow; index+=12) {
-            onlyZeroRow = ByteUtils.onlyZerosInRange(values, index, 12);
+            onlyZeroRow = ByteUtils.onlyZerosOrMaxValuesInRange(values, index, 12);
             if(!onlyZeroRow) {
                 DimEvolutionRequirements.DimEvolutionRequirementBlock block = DimEvolutionRequirements.DimEvolutionRequirementBlock.builder()
                         .evolveFromStatIndex(values[index])

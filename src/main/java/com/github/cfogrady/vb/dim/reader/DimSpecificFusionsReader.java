@@ -1,6 +1,5 @@
 package com.github.cfogrady.vb.dim.reader;
 
-import com.github.cfogrady.vb.dim.reader.content.DimFusions;
 import com.github.cfogrady.vb.dim.reader.content.DimSpecificFusions;
 
 import java.util.ArrayList;
@@ -13,7 +12,7 @@ class DimSpecificFusionsReader {
         boolean onlyZeroRow = false;
         int indexLimit = maxDimSpecificFusions != null ? maxDimSpecificFusions*4 : values.length;
         for(int index = 0; index < indexLimit && !onlyZeroRow; index+=4) {
-            onlyZeroRow = ByteUtils.onlyZerosInRange(values, index, 4);
+            onlyZeroRow = ByteUtils.onlyZerosOrMaxValuesInRange(values, index, 4);
             if(!onlyZeroRow) {
                 DimSpecificFusions.DimSpecificFusionBlock block = DimSpecificFusions.DimSpecificFusionBlock.builder()
                         .statsIndex(values[index])

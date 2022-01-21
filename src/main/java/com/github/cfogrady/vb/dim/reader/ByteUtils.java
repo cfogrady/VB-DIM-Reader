@@ -34,9 +34,10 @@ public class ByteUtils {
         return wrappedBytes.array();
     }
 
-    public static boolean onlyZerosInRange(int[] values, int start, int length) {
+    public static boolean onlyZerosOrMaxValuesInRange(int[] values, int start, int length) {
+        //Some cards mark rows of the table as invalid by using max 16-bit int instead of zeros...
         for(int i = start; i < start+length; i++) {
-            if(values[i] != 0) {
+            if(values[i] != 0 && values[i] != 65535) {
                 return false;
             }
         }

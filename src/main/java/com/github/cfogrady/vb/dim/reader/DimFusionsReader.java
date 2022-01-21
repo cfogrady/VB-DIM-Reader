@@ -11,7 +11,7 @@ class DimFusionsReader {
         int[] values = ByteUtils.getUnsigned16Bit(bytes);
         boolean onlyZeroRow = false;
         for(int index = 0; index < values.length && !onlyZeroRow; index+=5) {
-            onlyZeroRow = ByteUtils.onlyZerosInRange(values, index, 5);
+            onlyZeroRow = ByteUtils.onlyZerosOrMaxValuesInRange(values, index, 5);
             if(!onlyZeroRow) {
                 DimFusions.DimFusionBlock block = DimFusions.DimFusionBlock.builder()
                         .statsIndex(values[index])

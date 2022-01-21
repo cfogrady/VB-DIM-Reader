@@ -12,7 +12,7 @@ class DimAdventuresReader {
         boolean onlyZeroRow = false;
         int indexLimit = maxStages != null ? maxStages*5 : values.length;
         for(int index = 0; index < indexLimit-5 && !onlyZeroRow; index+=5) {
-            onlyZeroRow = ByteUtils.onlyZerosInRange(values, index, 5);
+            onlyZeroRow = ByteUtils.onlyZerosOrMaxValuesInRange(values, index, 5);
             if(!onlyZeroRow) {
                 DimAdventures.DimAdventureBlock block = DimAdventures.DimAdventureBlock.builder()
                         .steps(values[index])

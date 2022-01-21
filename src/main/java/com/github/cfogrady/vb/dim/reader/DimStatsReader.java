@@ -1,11 +1,12 @@
 package com.github.cfogrady.vb.dim.reader;
 
-import com.github.cfogrady.vb.dim.reader.ByteUtils;
 import com.github.cfogrady.vb.dim.reader.content.DimStats;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 class DimStatsReader {
     static DimStats dimStatsFromBytes(byte[] bytes, Integer entryLimit) {
         int[] values = ByteUtils.getUnsigned16Bit(bytes);
@@ -13,7 +14,7 @@ class DimStatsReader {
         boolean onlyZeroRow = false;
         int indexLimit = entryLimit != null ? entryLimit*12 : values.length-12;
         for(int index = 0; index < indexLimit && !onlyZeroRow; index+=12) {
-            onlyZeroRow = ByteUtils.onlyZerosInRange(values, index, 12);
+            onlyZeroRow = ByteUtils.onlyZerosOrMaxValuesInRange(values, index, 12);
             if(!onlyZeroRow) {
                 DimStats.DimStatBlock block = DimStats.DimStatBlock.builder()
                         .stage(values[index])
@@ -30,6 +31,7 @@ class DimStatsReader {
                         .secondPoolBattleChance(values[index+11])
                         .build();
                 statBlocks.add(block);
+                log.debug("Stats Block: {}", block);
             }
         }
         return DimStats.builder().statBlocks(statBlocks).build();
