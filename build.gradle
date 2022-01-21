@@ -35,11 +35,18 @@ dependencies {
     testImplementation 'org.slf4j:slf4j-simple:1.7.32'
 
     implementation 'at.favre.lib:bytes:1.5.0'
+    // Want to use this library with android eventually, so use android version
+    // implementation("com.google.guava:guava:31.0.1-android")
 
 
     // Use JUnit test framework.
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+compileJava {
+    sourceCompatibility = '11'
+    targetCompatibility = '11'
 }
 
 versioner {
