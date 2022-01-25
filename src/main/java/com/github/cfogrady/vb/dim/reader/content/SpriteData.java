@@ -10,6 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 @Slf4j
 public class SpriteData {
+
+	private final List<Sprite> sprites;
+	private final String text;
+
 	@Builder(toBuilder=true)
 	@Data
 	public static class Sprite {
@@ -56,8 +60,6 @@ public class SpriteData {
 			return bgra;
 		}
 	}
-	
-	private final List<Sprite> sprites;
 
 	private static int scaleTo24BitColor(int color, int fromBits) {
 		int maxValueOld = (int) Math.pow(2, fromBits) -1;

@@ -1,12 +1,14 @@
-package com.github.cfogrady.vb.dim.reader;
+package com.github.cfogrady.vb.dim.reader.reader;
 
+import com.github.cfogrady.vb.dim.reader.ByteUtils;
+import com.github.cfogrady.vb.dim.reader.ChecksumBuilder;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 @RequiredArgsConstructor
-public class InputStreamWithNot {
+class InputStreamWithNot {
     private final InputStream inputStream;
     private final ChecksumBuilder checksumBuilder;
     private int location = 0;

@@ -2,6 +2,9 @@ package com.github.cfogrady.vb.dim.reader;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.CharBuffer;
+import java.nio.IntBuffer;
+import java.nio.charset.Charset;
 
 import at.favre.lib.bytes.Bytes;
 
@@ -26,6 +29,18 @@ public class ByteUtils {
         int[] values = new int[bytes.length/4];
         ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).asIntBuffer().get(values);
         return values;
+    }
+
+    public static byte[] convert16BitIntToBytes(int value) {
+        ByteBuffer byteBuffer = ByteBuffer.allocate(2);
+        byteBuffer.order(ByteOrder.LITTLE_ENDIAN).asCharBuffer().append((char) value);
+        return byteBuffer.array();
+    }
+
+    public static byte[] convert32BitIntToBytes(int value) {
+        ByteBuffer byteBuffer = ByteBuffer.allocate(4);
+        byteBuffer.order(ByteOrder.LITTLE_ENDIAN).asIntBuffer().put(value);
+        return byteBuffer.array();
     }
 
     public static byte[] applyNotOperation(byte[] bytes) {

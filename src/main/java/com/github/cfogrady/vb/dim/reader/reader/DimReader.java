@@ -1,6 +1,8 @@
-package com.github.cfogrady.vb.dim.reader;
+package com.github.cfogrady.vb.dim.reader.reader;
 
 
+import com.github.cfogrady.vb.dim.reader.ByteUtils;
+import com.github.cfogrady.vb.dim.reader.ChecksumBuilder;
 import com.github.cfogrady.vb.dim.reader.content.*;
 import lombok.extern.slf4j.Slf4j;
 

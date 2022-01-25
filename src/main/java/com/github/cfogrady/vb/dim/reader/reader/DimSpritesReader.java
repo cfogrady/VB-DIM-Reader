@@ -1,5 +1,6 @@
-package com.github.cfogrady.vb.dim.reader;
+package com.github.cfogrady.vb.dim.reader.reader;
 
+import com.github.cfogrady.vb.dim.reader.ByteUtils;
 import com.github.cfogrady.vb.dim.reader.content.SpriteData;
 import lombok.extern.slf4j.Slf4j;
 
@@ -11,9 +12,9 @@ import java.util.List;
 class DimSpritesReader {
     static SpriteData spriteDataFromBytesAndStream(byte[] spriteDimensionBytes, InputStreamWithNot spriteDataSection) throws IOException {
         int[] spriteDimensions = ByteUtils.getUnsigned16Bit(spriteDimensionBytes);
-        spriteDataSection.readNBytes(0x18);
+        String text = new String(spriteDataSection.readNBytes(0x18));
         int finalOffset = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes(4))[0];
-        spriteDataSection.readNBytes(0x48 - 0x1c);
+        spriteDataSection.readToOffset(0x100048);
         int numberOfSprites = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes(4))[0];
         int[] spriteOffsets = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes(numberOfSprites*4));
         int oneMore = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes(4))[0];
@@ -38,6 +39,6 @@ class DimSpritesReader {
             }
             sprites.add(sprite);
         }
-        return SpriteData.builder().sprites(sprites).build();
+        return SpriteData.builder().sprites(sprites).text(text).build();
     }
 }

@@ -1,5 +1,6 @@
-package com.github.cfogrady.vb.dim.reader;
+package com.github.cfogrady.vb.dim.reader.reader;
 
+import com.github.cfogrady.vb.dim.reader.ByteUtils;
 import com.github.cfogrady.vb.dim.reader.content.DimFusions;
 
 import java.util.ArrayList;

@@ -51,7 +51,7 @@ compileJava {
 
 versioner {
     pattern {
-        pattern = "%M.%m.%p.(%c-%h)"
+        pattern = "%M.%m.%p(.%c-%h)"
     }
 }
 

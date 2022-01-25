@@ -18,4 +18,20 @@ public class ByteUtilsTest {
         Assertions.assertEquals((byte)0b11111101, outputBytes[7]);
         Assertions.assertEquals((byte)0b11111000, outputBytes[8]);
     }
+
+    @Test
+    public void testThatConvert16BitIntToBytesWorks() {
+        int singeByteValue = 12;
+        int doubleByteValue = 256;
+        byte[] singeByteValueArray = ByteUtils.convert16BitIntToBytes(singeByteValue);
+        byte[] doubleByteValueArray = ByteUtils.convert16BitIntToBytes(doubleByteValue);
+
+        Assertions.assertEquals(12, singeByteValueArray[0]);
+        Assertions.assertEquals(0, singeByteValueArray[1]);
+        Assertions.assertEquals(2, singeByteValueArray.length);
+
+        Assertions.assertEquals(0, doubleByteValueArray[0]);
+        Assertions.assertEquals(1, doubleByteValueArray[1]);
+        Assertions.assertEquals(2, doubleByteValueArray.length);
+    }
 }
