@@ -2,9 +2,6 @@ package com.github.cfogrady.vb.dim.reader;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.CharBuffer;
-import java.nio.IntBuffer;
-import java.nio.charset.Charset;
 
 import at.favre.lib.bytes.Bytes;
 

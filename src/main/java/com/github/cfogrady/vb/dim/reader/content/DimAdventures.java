@@ -9,6 +9,8 @@ import lombok.Data;
 @Builder(toBuilder=true)
 @Data
 public class DimAdventures {
+	public static final int VB_TABLE_SIZE = 15;
+
 	@Builder(toBuilder=true)
 	@Data
 	public static class DimAdventureBlock {

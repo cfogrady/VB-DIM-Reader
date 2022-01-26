@@ -16,16 +16,20 @@ public class DimWriter {
     public static final int NONE_VALUE = 65535;
 
     public void writeDimData(DimContent dimContent, OutputStream outputStream) {
+        writeDimData(dimContent, outputStream, false);
+    }
+
+    public void writeDimData(DimContent dimContent, OutputStream outputStream, boolean strictEmulation) {
         ChecksumBuilder checksumBuilder = new ChecksumBuilder();
         OutputStreamWithNot outputStreamWithNot = OutputStreamWithNot.wrap(outputStream, checksumBuilder);
         try {
             HeaderWriter.writeHeader(dimContent.getDimHeader(), outputStreamWithNot);
-            StatsWriter.writeStats(dimContent.getDimStats(), outputStreamWithNot);
-            EvolutionsWriter.writeEvolutions(dimContent.getDimEvolutionRequirements(), outputStreamWithNot);
-            AdventuresWriter.writeAdventures(dimContent.getDimAdventures(), outputStreamWithNot);
+            StatsWriter.writeStats(dimContent.getDimStats(), outputStreamWithNot, strictEmulation);
+            EvolutionsWriter.writeEvolutions(dimContent.getDimEvolutionRequirements(), outputStreamWithNot, strictEmulation);
+            AdventuresWriter.writeAdventures(dimContent.getDimAdventures(), outputStreamWithNot, strictEmulation);
             SpriteDimentionsWriter.writeSpriteDimensions(dimContent.getSpriteData(), outputStreamWithNot);
-            FusionsWriter.writeFusions(dimContent.getDimFusions(), outputStreamWithNot);
-            SpecificFusionsWriter.writeSpecificFusions(dimContent.getDimSpecificFusion(), outputStreamWithNot);
+            FusionsWriter.writeFusions(dimContent.getDimFusions(), outputStreamWithNot, strictEmulation);
+            SpecificFusionsWriter.writeSpecificFusions(dimContent.getDimSpecificFusion(), outputStreamWithNot, strictEmulation);
             SpriteWriter.writeSpriteData(dimContent.getSpriteData(), outputStreamWithNot);
             outputStreamWithNot.writeZerosUntilOffset(0x3ffffe);
             outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(outputStreamWithNot.getChecksum()));

@@ -8,6 +8,8 @@ import lombok.Data;
 @Builder(toBuilder=true)
 @Data
 public class DimEvolutionRequirements {
+	public static int VB_TABLE_SIZE = 34;
+
 	@Builder(toBuilder=true)
 	@Data
 	public static class DimEvolutionRequirementBlock {

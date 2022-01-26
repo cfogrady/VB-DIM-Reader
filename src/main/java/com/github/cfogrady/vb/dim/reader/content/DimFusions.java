@@ -8,6 +8,8 @@ import lombok.Data;
 @Builder(toBuilder=true)
 @Data
 public class DimFusions {
+	public static final int VB_TABLE_SIZE = 10;
+
 	@Builder(toBuilder=true)
 	@Data
 	public static class DimFusionBlock {

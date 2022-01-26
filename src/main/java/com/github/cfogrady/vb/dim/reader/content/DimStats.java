@@ -8,6 +8,9 @@ import lombok.Data;
 @Data
 @Builder(toBuilder = true)
 public class DimStats {
+
+	public static final int VB_TABLE_SIZE = 17;
+
 	@Data
 	@Builder(toBuilder = true)
 	public static class DimStatBlock {
