@@ -36,7 +36,7 @@ public class EvolutionsWriter {
                 outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(DimWriter.NONE_VALUE));
                 outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(0));
                 outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(DimWriter.NONE_VALUE));
-                outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(0));
+                outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(DimWriter.NONE_VALUE));
                 outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(DimWriter.NONE_VALUE));
             }
         }
