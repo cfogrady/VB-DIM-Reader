@@ -22,4 +22,5 @@ public class DimAdventures {
 	}
 	
 	private final List<DimAdventureBlock> adventureBlocks;
+	private final int dummyRows;
 }

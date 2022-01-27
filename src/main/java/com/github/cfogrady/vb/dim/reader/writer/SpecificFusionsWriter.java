@@ -1,13 +1,14 @@
 package com.github.cfogrady.vb.dim.reader.writer;
 
 import com.github.cfogrady.vb.dim.reader.ByteUtils;
-import com.github.cfogrady.vb.dim.reader.content.DimFusions;
 import com.github.cfogrady.vb.dim.reader.content.DimSpecificFusions;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
+@Slf4j
 public class SpecificFusionsWriter {
-    public static void writeSpecificFusions(DimSpecificFusions specificFusions, OutputStreamWithNot outputStreamWithNot, boolean strictEmulation) throws IOException {
+    public static void writeSpecificFusions(DimSpecificFusions specificFusions, OutputStreamWithNot outputStreamWithNot) throws IOException {
         outputStreamWithNot.writeZerosUntilOffset(0x80000);
         int currentIndex = 0;
         for(DimSpecificFusions.DimSpecificFusionBlock specificFusionEntry : specificFusions.getDimSpecificFusionBlocks()) {
@@ -17,8 +18,11 @@ public class SpecificFusionsWriter {
             outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(specificFusionEntry.getFusionDimSlotId()));
             currentIndex++;
         }
-        if(strictEmulation && currentIndex < DimSpecificFusions.VB_TABLE_SIZE) {
-            for(int slot = currentIndex; slot < DimSpecificFusions.VB_TABLE_SIZE; slot++) {
+        if(specificFusions.getDimSpecificFusionBlocks().size() > 1) {
+            log.warn("More than one specific fusion may not work...");
+        }
+        if(specificFusions.getDummyRows() > 0 && currentIndex < DimSpecificFusions.VB_TABLE_SIZE) {
+            for (int index = 0; index < specificFusions.getDummyRows() && currentIndex + index < DimSpecificFusions.VB_TABLE_SIZE; index++) {
                 for(int i = 0; i < 4; i++) {
                     outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(DimWriter.NONE_VALUE));
                 }

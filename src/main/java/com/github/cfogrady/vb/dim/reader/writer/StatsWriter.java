@@ -6,7 +6,7 @@ import com.github.cfogrady.vb.dim.reader.content.DimStats;
 import java.io.IOException;
 
 public class StatsWriter {
-    static void writeStats(DimStats stats, OutputStreamWithNot outputStreamWithNot, boolean strictEmulation) throws IOException {
+    static void writeStats(DimStats stats, OutputStreamWithNot outputStreamWithNot) throws IOException {
         outputStreamWithNot.writeZerosUntilOffset(0x30000);
         int currentSlot = 0;
         for(DimStats.DimStatBlock statsBlock : stats.getStatBlocks()) {
@@ -28,8 +28,8 @@ public class StatsWriter {
             outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(statsBlock.getSecondPoolBattleChance()));
             currentSlot++;
         }
-        if(strictEmulation && currentSlot < DimStats.VB_TABLE_SIZE) {
-            for(int slot = currentSlot; slot < DimStats.VB_TABLE_SIZE; slot++) {
+        if(stats.getDummyRows() > 0 && currentSlot < DimStats.VB_TABLE_SIZE) {
+            for(int index = 0; index < stats.getDummyRows() && currentSlot + index < DimStats.VB_TABLE_SIZE; index++) {
                 for(int i = 0; i < 12; i++) {
                     outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(DimWriter.NONE_VALUE));
                 }

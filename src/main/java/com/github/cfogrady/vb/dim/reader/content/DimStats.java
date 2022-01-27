@@ -29,5 +29,6 @@ public class DimStats {
 	}
 	
 	private final List<DimStatBlock> statBlocks;
+	private final int dummyRows;
 
 }

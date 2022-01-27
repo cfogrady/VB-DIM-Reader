@@ -7,14 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 class DimAdventuresReader {
-    static DimAdventures dimAdventuresFromBytes(byte[] bytes, Integer maxStages) {
-        List<DimAdventures.DimAdventureBlock> adventureBlocks = new ArrayList<>(15);
+    static DimAdventures dimAdventuresFromBytes(byte[] bytes) {
+        List<DimAdventures.DimAdventureBlock> adventureBlocks = new ArrayList<>(DimAdventures.VB_TABLE_SIZE);
         int[] values = ByteUtils.getUnsigned16Bit(bytes);
-        boolean onlyZeroRow = false;
-        int indexLimit = maxStages != null ? maxStages*5 : values.length;
-        for(int index = 0; index < indexLimit-5 && !onlyZeroRow; index+=5) {
-            onlyZeroRow = ByteUtils.onlyZerosOrMaxValuesInRange(values, index, 5);
-            if(!onlyZeroRow) {
+        int index = 0;
+        boolean onlyZeroRow = ByteUtils.onlyZerosInRange(values, index, 5);
+        int dummyRows = 0;
+        while(!onlyZeroRow) {
+            if (!ByteUtils.onlyZerosOrMaxValuesInRange(values, index, 5)) {
                 DimAdventures.DimAdventureBlock block = DimAdventures.DimAdventureBlock.builder()
                         .steps(values[index])
                         .bossStatsIndex(values[index+1])
@@ -23,8 +23,12 @@ class DimAdventuresReader {
                         .bossAp(values[index+4])
                         .build();
                 adventureBlocks.add(block);
+            } else {
+                dummyRows++;
             }
+            index += 5;
+            onlyZeroRow = ByteUtils.onlyZerosInRange(values, index, 5); //find out if the next row is only zeros
         }
-        return DimAdventures.builder().adventureBlocks(adventureBlocks).build();
+        return DimAdventures.builder().adventureBlocks(adventureBlocks).dummyRows(dummyRows).build();
     }
 }

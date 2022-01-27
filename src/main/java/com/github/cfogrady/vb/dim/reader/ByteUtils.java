@@ -55,4 +55,14 @@ public class ByteUtils {
         }
         return true;
     }
+
+    public static boolean onlyZerosInRange(int[] values, int start, int length) {
+        //Some cards mark rows of the table as invalid by using max 16-bit int instead of zeros...
+        for(int i = start; i < start+length; i++) {
+            if(values[i] != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

@@ -21,5 +21,6 @@ public class DimFusions {
 	}
 	
 	private final List<DimFusionBlock> fusionBlocks;
+	private final int dummyRows;
 
 }

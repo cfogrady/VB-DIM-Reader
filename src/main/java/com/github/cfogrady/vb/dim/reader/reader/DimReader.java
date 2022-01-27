@@ -12,15 +12,10 @@ import java.io.UncheckedIOException;
 
 @Slf4j
 public class DimReader {
-    public DimContent readDimData(InputStream inputStream, boolean strictEmulation) {
-        if(strictEmulation) {
-            return readDimData(inputStream, 17, 15, 1, true);
-        } else {
-            return readDimData(inputStream, null, null, null, false);
-        }
-    }
 
-    public DimContent readDimData(InputStream inputStream, Integer maxStatSlots, Integer maxAdventures, Integer maxDimSpecificFusions, boolean verifyChecksum) {
+    public static final int NONE_VALUE = 65535;
+
+    public DimContent readDimData(InputStream inputStream, boolean verifyChecksum) {
         ChecksumBuilder checksumBuilder = new ChecksumBuilder();
         try {
             InputStreamWithNot inputStreamWithNot = InputStreamWithNot.wrap(inputStream, checksumBuilder);
@@ -28,16 +23,16 @@ public class DimReader {
             DimHeader header = DimHeaderReader.dimHeaderFromBytes(bytes);
             inputStreamWithNot.readToOffset(0x30000); // skip everything until stats section
             bytes = inputStreamWithNot.readToOffset(0x40000);
-            DimStats stats = DimStatsReader.dimStatsFromBytes(bytes, maxStatSlots);
+            DimStats stats = DimStatsReader.dimStatsFromBytes(bytes);
             bytes = inputStreamWithNot.readToOffset(0x50000);
             DimEvolutionRequirements evolutionRequirements = DimEvolutionsReader.dimEvolutionRequirementsFromBytes(bytes);
             bytes = inputStreamWithNot.readToOffset(0x60000);
-            DimAdventures adventures = DimAdventuresReader.dimAdventuresFromBytes(bytes, maxAdventures);
+            DimAdventures adventures = DimAdventuresReader.dimAdventuresFromBytes(bytes);
             byte[] spriteDimensions = inputStreamWithNot.readToOffset(0x70000);
             bytes = inputStreamWithNot.readToOffset(0x80000);
             DimFusions fusions = DimFusionsReader.dimFusionsFromBytes(bytes);
             bytes = inputStreamWithNot.readToOffset(0x100000);
-            DimSpecificFusions dimSpecificFusions = DimSpecificFusionsReader.dimSpecificFusionsFromBytes(bytes, maxDimSpecificFusions);
+            DimSpecificFusions dimSpecificFusions = DimSpecificFusionsReader.dimSpecificFusionsFromBytes(bytes);
             SpriteData spriteData = DimSpritesReader.spriteDataFromBytesAndStream(spriteDimensions, inputStreamWithNot);
             inputStreamWithNot.readToOffset(0x3FFFFE);
             bytes = inputStreamWithNot.readNBytes(2);

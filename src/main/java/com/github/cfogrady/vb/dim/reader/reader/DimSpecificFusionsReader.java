@@ -7,14 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 class DimSpecificFusionsReader {
-    static DimSpecificFusions dimSpecificFusionsFromBytes(byte[] bytes, Integer maxDimSpecificFusions) {
-        List<DimSpecificFusions.DimSpecificFusionBlock> dimSpecificFusionBlocks = new ArrayList<>();
+    static DimSpecificFusions dimSpecificFusionsFromBytes(byte[] bytes) {
+        List<DimSpecificFusions.DimSpecificFusionBlock> dimSpecificFusionBlocks = new ArrayList<>(DimSpecificFusions.VB_TABLE_SIZE);
         int[] values = ByteUtils.getUnsigned16Bit(bytes);
-        boolean onlyZeroRow = false;
-        int indexLimit = maxDimSpecificFusions != null ? maxDimSpecificFusions*4 : values.length;
-        for(int index = 0; index < indexLimit && !onlyZeroRow; index+=4) {
-            onlyZeroRow = ByteUtils.onlyZerosOrMaxValuesInRange(values, index, 4);
-            if(!onlyZeroRow) {
+        int index = 0;
+        boolean onlyZeroRow = ByteUtils.onlyZerosInRange(values, index, 4);
+        int dummyRows = 0;
+        while(!onlyZeroRow) {
+            if (!ByteUtils.onlyZerosOrMaxValuesInRange(values, index, 4)) {
                 DimSpecificFusions.DimSpecificFusionBlock block = DimSpecificFusions.DimSpecificFusionBlock.builder()
                         .statsIndex(values[index])
                         .statsIndexForFusionResult(values[index+1])
@@ -22,8 +22,12 @@ class DimSpecificFusionsReader {
                         .fusionDimSlotId(values[index+3])
                         .build();
                 dimSpecificFusionBlocks.add(block);
+            } else {
+                dummyRows++;
             }
+            index += 4;
+            onlyZeroRow = ByteUtils.onlyZerosInRange(values, index, 4); //find out if the next row is only zeros
         }
-        return DimSpecificFusions.builder().dimSpecificFusionBlocks(dimSpecificFusionBlocks).build();
+        return DimSpecificFusions.builder().dimSpecificFusionBlocks(dimSpecificFusionBlocks).dummyRows(dummyRows).build();
     }
 }

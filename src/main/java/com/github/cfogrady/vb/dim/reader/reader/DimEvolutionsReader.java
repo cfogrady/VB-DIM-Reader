@@ -10,12 +10,13 @@ import java.util.List;
 @Slf4j
 class DimEvolutionsReader {
     static DimEvolutionRequirements dimEvolutionRequirementsFromBytes(byte[] bytes) {
-        List<DimEvolutionRequirements.DimEvolutionRequirementBlock> evolutionRequirementBlocks = new ArrayList<>();
+        List<DimEvolutionRequirements.DimEvolutionRequirementBlock> evolutionRequirementBlocks = new ArrayList<>(DimEvolutionRequirements.VB_TABLE_SIZE);
         int[] values = ByteUtils.getUnsigned16Bit(bytes);
-        boolean onlyZeroRow = false;
-        for(int index = 0; index < values.length-12 && !onlyZeroRow; index+=12) {
-            onlyZeroRow = ByteUtils.onlyZerosOrMaxValuesInRange(values, index, 12);
-            if(!onlyZeroRow) {
+        int index = 0;
+        boolean onlyZeroRow = ByteUtils.onlyZerosInRange(values, index, 12);
+        int dummyRows = 0;
+        while(!onlyZeroRow) {
+            if(!ByteUtils.onlyZerosOrMaxValuesInRange(values, index, 12)) {
                 if(values[index+3] != 65535) {
                     log.warn("Unexpected value {} at index {}-{} in evolution table for DIM. Please make an issue with the DIM card in question on https://github.com/cfogrady/DIM-Modifier/issues so I purchase and analyze the card", values[index+3], index/12, 3);
                 }
@@ -41,8 +42,12 @@ class DimEvolutionsReader {
                         .evolveToStatIndex(values[index+10])
                         .build();
                 evolutionRequirementBlocks.add(block);
+            } else {
+                dummyRows++;
             }
+            index += 12;
+            onlyZeroRow = ByteUtils.onlyZerosInRange(values, index, 12); //find out if the next row is only zeros
         }
-        return DimEvolutionRequirements.builder().evolutionRequirementBlocks(evolutionRequirementBlocks).build();
+        return DimEvolutionRequirements.builder().evolutionRequirementBlocks(evolutionRequirementBlocks).dummyRows(dummyRows).build();
     }
 }

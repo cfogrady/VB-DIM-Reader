@@ -31,4 +31,5 @@ public class DimEvolutionRequirements {
 	}
 	
 	private final List<DimEvolutionRequirementBlock> evolutionRequirementBlocks;
+	private final int dummyRows;
 }

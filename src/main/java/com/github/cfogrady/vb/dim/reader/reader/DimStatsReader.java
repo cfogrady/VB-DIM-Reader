@@ -9,14 +9,14 @@ import java.util.List;
 
 @Slf4j
 class DimStatsReader {
-    static DimStats dimStatsFromBytes(byte[] bytes, Integer entryLimit) {
+    static DimStats dimStatsFromBytes(byte[] bytes) {
         int[] values = ByteUtils.getUnsigned16Bit(bytes);
-        List<DimStats.DimStatBlock> statBlocks = new ArrayList<>(17);
-        boolean onlyZeroRow = false;
-        int indexLimit = entryLimit != null ? entryLimit*12 : values.length-12;
-        for(int index = 0; index < indexLimit && !onlyZeroRow; index+=12) {
-            onlyZeroRow = ByteUtils.onlyZerosOrMaxValuesInRange(values, index, 12);
-            if(!onlyZeroRow) {
+        List<DimStats.DimStatBlock> statBlocks = new ArrayList<>(DimStats.VB_TABLE_SIZE);
+        int index = 0;
+        boolean onlyZeroRow = ByteUtils.onlyZerosInRange(values, index, 12);
+        int dummyRows = 0;
+        while(!onlyZeroRow) {
+            if(!ByteUtils.onlyZerosOrMaxValuesInRange(values, index, 12)) {
                 DimStats.DimStatBlock block = DimStats.DimStatBlock.builder()
                         .stage(values[index])
                         .unlockRequired(values[index+1] == 1)
@@ -33,8 +33,12 @@ class DimStatsReader {
                         .build();
                 statBlocks.add(block);
                 log.debug("Stats Block: {}", block);
+            } else {
+                dummyRows++;
             }
+            index += 12;
+            onlyZeroRow = ByteUtils.onlyZerosInRange(values, index, 12); //find out if the next row is only zeros
         }
-        return DimStats.builder().statBlocks(statBlocks).build();
+        return DimStats.builder().statBlocks(statBlocks).dummyRows(dummyRows).build();
     }
 }

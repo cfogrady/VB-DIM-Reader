@@ -20,4 +20,5 @@ public class DimSpecificFusions {
 	}
 	
 	private final List<DimSpecificFusionBlock> dimSpecificFusionBlocks;
+	private final int dummyRows;
 }
