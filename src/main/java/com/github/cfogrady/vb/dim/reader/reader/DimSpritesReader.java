@@ -16,15 +16,19 @@ class DimSpritesReader {
         int finalOffset = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes(4))[0];
         spriteDataSection.readToOffset(0x100048);
         int numberOfSprites = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes(4))[0];
-        int[] spriteOffsets = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes(numberOfSprites*4));
-        int endSignalLocation = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes(4))[0];
+        int[] pointers = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes((numberOfSprites+1)*4));
+        int endSignalLocation = pointers[pointers.length-1];
         if(finalOffset != endSignalLocation) {
             log.warn("End signal pointer {} at 0x100018 doesn't match the pointer at the end of the pointer table {}.", finalOffset, endSignalLocation);
         }
         List<SpriteData.Sprite> sprites = new ArrayList<>(numberOfSprites);
-        int currentOffset = spriteOffsets[0];
+        int currentOffset = pointers[0];
         for(int i = 0; i < numberOfSprites; i++)
         {
+            spriteDataSection.readToOffset(currentOffset + 0x100000);
+            if(pointers[i+1] - currentOffset <= 0) {
+                throw new IllegalStateException("Unable to handle case where sprites are not in order. If this is an official DIM please raise an issue at https://github.com/cfogrady/VB-DIM-Reader/issues");
+            }
             int width = spriteDimensions[i*2];
             int height = spriteDimensions[i*2 + 1];
             int expectedSize = width * height * 2;
@@ -33,12 +37,10 @@ class DimSpritesReader {
                     .height(height)
                     .pixelData(spriteDataSection.readNBytes(expectedSize))
                     .build();
-            if(i != numberOfSprites-1) {
-                if(sprite.getPixelData().length != spriteOffsets[i+1] - currentOffset) {
-                    throw new IllegalStateException("Expected sprite size " + sprite.getPixelData().length + " doesn't match delta from current offset " + currentOffset + " to next offset " + spriteOffsets[i+1]);
-                }
-                currentOffset = spriteOffsets[i+1];
+            if(sprite.getPixelData().length != pointers[i+1] - currentOffset) {
+                throw new IllegalStateException("Expected sprite size " + sprite.getPixelData().length + " doesn't match delta from current offset " + currentOffset + " to next offset " + pointers[i+1]);
             }
+            currentOffset = pointers[i+1];
             sprites.add(sprite);
         }
         return SpriteData.builder().sprites(sprites).text(text).build();

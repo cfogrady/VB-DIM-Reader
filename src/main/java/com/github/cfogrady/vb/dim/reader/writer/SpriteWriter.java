@@ -21,15 +21,18 @@ public class SpriteWriter {
         outputStreamWithNot.writeBytes(ByteUtils.convert32BitIntToBytes(1)); // 0x40
         outputStreamWithNot.writeBytes(ByteUtils.convert32BitIntToBytes(72)); // 0x44
         outputStreamWithNot.writeBytes(ByteUtils.convert32BitIntToBytes(spriteData.getSprites().size())); // 0x48
+        // Pointer Table
         int currentOffset = offsetForFirstSprite;
         for(SpriteData.Sprite sprite : spriteData.getSprites()) {
             outputStreamWithNot.writeBytes(ByteUtils.convert32BitIntToBytes(currentOffset));
             currentOffset = currentOffset + sprite.getWidth() * sprite.getHeight() * 2;
         }
         outputStreamWithNot.writeBytes(ByteUtils.convert32BitIntToBytes(currentOffset));
+        // Pixel Data
         for(SpriteData.Sprite sprite : spriteData.getSprites()) {
             outputStreamWithNot.writeBytes(sprite.getPixelData());
         }
+        // Termination bytes
         outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(65282));
         outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(DimWriter.NONE_VALUE));
     }
