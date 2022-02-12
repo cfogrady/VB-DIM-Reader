@@ -17,8 +17,10 @@ class DimSpritesReader {
         spriteDataSection.readToOffset(0x100048);
         int numberOfSprites = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes(4))[0];
         int[] spriteOffsets = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes(numberOfSprites*4));
-        int oneMore = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes(4))[0];
-        log.info("Bytes between final offset and sprites: {} - {}", oneMore, Integer.toHexString(oneMore));
+        int endSignalLocation = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes(4))[0];
+        if(finalOffset != endSignalLocation) {
+            log.warn("End signal pointer {} at 0x100018 doesn't match the pointer at the end of the pointer table {}.", finalOffset, endSignalLocation);
+        }
         List<SpriteData.Sprite> sprites = new ArrayList<>(numberOfSprites);
         int currentOffset = spriteOffsets[0];
         for(int i = 0; i < numberOfSprites; i++)
