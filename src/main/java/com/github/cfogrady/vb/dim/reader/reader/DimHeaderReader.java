@@ -16,6 +16,10 @@ class DimHeaderReader {
             throw new IllegalArgumentException("Not enough bytes for header!");
         }
         int[] values = ByteUtils.getUnsigned16Bit(bytes);
+        if(values[0x30] != 0) {
+            log.error("Reader only handles data DIMs");
+            throw new IllegalArgumentException("Reader only handles data DIMs");
+        }
         if(values[0x32/2] != values[0x34/2]) {
             log.warn("Presumed DIM Ids {} and {} do not match! Please make an issue with the DIM card in question on https://github.com/cfogrady/DIM-Modifier/issues so I purchase and analyze the card", values[0x32/2], values[0x34/2]);
         }

@@ -17,22 +17,27 @@ class DimStatsReader {
         int dummyRows = 0;
         while(!onlyZeroRow) {
             if(!ByteUtils.onlyZerosOrMaxValuesInRange(values, index, 12)) {
-                DimStats.DimStatBlock block = DimStats.DimStatBlock.builder()
-                        .stage(values[index])
-                        .unlockRequired(values[index+1] == 1)
-                        .attribute(values[index+2])
-                        .disposition(values[index+3])
-                        .smallAttackId(values[index+4])
-                        .bigAttackId(values[index+5])
-                        .dpStars(values[index+6])
-                        .dp(values[index+7])
-                        .hp(values[index+8])
-                        .ap(values[index+9])
-                        .firstPoolBattleChance(values[index+10])
-                        .secondPoolBattleChance(values[index+11])
-                        .build();
-                statBlocks.add(block);
-                log.debug("Stats Block: {}", block);
+                if(values[index] > 5) {
+                    log.warn("Row found with values but invalid stage! There are two official GP DIMs with this bug. Treating as a dummy row still");
+                    dummyRows++;
+                } else {
+                    DimStats.DimStatBlock block = DimStats.DimStatBlock.builder()
+                            .stage(values[index])
+                            .unlockRequired(values[index+1] == 1)
+                            .attribute(values[index+2])
+                            .disposition(values[index+3])
+                            .smallAttackId(values[index+4])
+                            .bigAttackId(values[index+5])
+                            .dpStars(values[index+6])
+                            .dp(values[index+7])
+                            .hp(values[index+8])
+                            .ap(values[index+9])
+                            .firstPoolBattleChance(values[index+10])
+                            .secondPoolBattleChance(values[index+11])
+                            .build();
+                    statBlocks.add(block);
+                    log.debug("Stats Block: {}", block);
+                }
             } else {
                 dummyRows++;
             }
