@@ -9,7 +9,7 @@ public class DimReaderTest {
     @Test
     void testThatDimReaderWorks() throws IOException {
         DimReader reader = new DimReader();
-        File file = new File("C:\\dev\\Digimon Hacking\\01._Agumon_EDBEEEBB.bin");
+        File file = new File("C:\\dev\\Digimon Hacking\\ProblemDIMs\\V3_Espimon.bin");
         InputStream fileInputStream = new FileInputStream(file);
         reader.readDimData(fileInputStream, false);
     }

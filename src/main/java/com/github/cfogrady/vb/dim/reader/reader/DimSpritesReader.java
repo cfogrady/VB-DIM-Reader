@@ -43,6 +43,6 @@ class DimSpritesReader {
             currentOffset = pointers[i+1];
             sprites.add(sprite);
         }
-        return SpriteData.builder().sprites(sprites).text(text).build();
+        return SpriteData.builder().sprites(sprites).text(text).spriteChecksums(spriteDataSection.getSpriteChecksums()).build();
     }
 }

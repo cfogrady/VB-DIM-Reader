@@ -2,14 +2,15 @@ package com.github.cfogrady.vb.dim.reader.writer;
 
 import com.github.cfogrady.vb.dim.reader.ByteUtils;
 import com.github.cfogrady.vb.dim.reader.ChecksumBuilder;
+import com.github.cfogrady.vb.dim.reader.reader.SpriteChecksumBuilder;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 
 @RequiredArgsConstructor
-class OutputStreamWithNot {
+class OutputStreamWithNot implements ByteOffsetOutputStream {
     private final OutputStream outputStream;
     private final ChecksumBuilder checksumBuilder;
     private int location = 0;

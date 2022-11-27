@@ -16,4 +16,13 @@ public class DimHeader {
 	private final byte[] headerSignature;
 	private final boolean has0x8fSet;
 	private final byte[] spriteSignature;
+
+	public boolean hasSpriteSignature() {
+		for(byte b : spriteSignature) {
+			if(b != 0) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

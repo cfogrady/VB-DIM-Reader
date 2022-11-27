@@ -13,6 +13,7 @@ public class SpriteData {
 
 	private final List<Sprite> sprites;
 	private final String text;
+	private final List<Integer> spriteChecksums;
 
 	@Builder(toBuilder=true)
 	@Data

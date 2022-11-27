@@ -6,20 +6,23 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 @RequiredArgsConstructor
 class InputStreamWithNot {
     private final InputStream inputStream;
     private final ChecksumBuilder checksumBuilder;
+    private final SpriteChecksumBuilder spriteChecksumBuilder;
     private int location = 0;
-    public static InputStreamWithNot wrap(InputStream inputStream, ChecksumBuilder checksumBuilder) {
-        return new InputStreamWithNot(inputStream, checksumBuilder);
+    public static InputStreamWithNot wrap(InputStream inputStream, ChecksumBuilder checksumBuilder, SpriteChecksumBuilder spriteChecksumBuilder) {
+        return new InputStreamWithNot(inputStream, checksumBuilder, spriteChecksumBuilder);
     }
 
     public byte[] readNBytes(int n) throws IOException {
         byte[] bytes = inputStream.readNBytes(n);
         bytes = ByteUtils.applyNotOperation(bytes);
         checksumBuilder.addBytes(bytes, location);
+        spriteChecksumBuilder.addBytes(bytes, location);
         location += n;
         return bytes;
     }
@@ -40,6 +43,10 @@ class InputStreamWithNot {
 
     public int getChecksum() {
         return checksumBuilder.getCheckSum();
+    }
+
+    public ArrayList<Integer> getSpriteChecksums() {
+        return spriteChecksumBuilder.getChecksums();
     }
 
 }

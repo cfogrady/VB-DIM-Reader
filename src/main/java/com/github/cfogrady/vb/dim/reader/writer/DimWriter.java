@@ -5,6 +5,7 @@ import com.github.cfogrady.vb.dim.reader.ByteUtils;
 import com.github.cfogrady.vb.dim.reader.ChecksumBuilder;
 import com.github.cfogrady.vb.dim.reader.content.*;
 import com.github.cfogrady.vb.dim.reader.reader.DimReader;
+import com.github.cfogrady.vb.dim.reader.reader.SpriteChecksumBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class DimWriter {
             SpriteDimentionsWriter.writeSpriteDimensions(dimContent.getSpriteData(), outputStreamWithNot);
             FusionsWriter.writeFusions(dimContent.getDimFusions(), outputStreamWithNot);
             SpecificFusionsWriter.writeSpecificFusions(dimContent.getDimSpecificFusion(), outputStreamWithNot);
-            SpriteWriter.writeSpriteData(dimContent.getSpriteData(), outputStreamWithNot);
+            SpriteWriter.writeSpriteData(dimContent.getSpriteData(), dimContent.getDimHeader().hasSpriteSignature(), outputStreamWithNot);
             outputStreamWithNot.writeZerosUntilOffset(0x3ffffe);
             outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(outputStreamWithNot.getChecksum()));
         } catch (IOException e) {
