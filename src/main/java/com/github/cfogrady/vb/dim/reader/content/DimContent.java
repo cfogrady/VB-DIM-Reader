@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder(toBuilder=true)
-public class DimContent {
+public class DimContent implements CardContent {
 	private final DimHeader dimHeader;
 	private final DimStats dimStats;
 	private final DimEvolutionRequirements dimEvolutionRequirements;
@@ -15,4 +15,9 @@ public class DimContent {
 	private final int checksum;
 	private final int calculatedCheckSum;
 	private final SpriteData spriteData;
+
+	@Override
+	public ContentType getContentType() {
+		return ContentType.DIM;
+	}
 }
