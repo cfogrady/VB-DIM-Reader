@@ -1,6 +1,7 @@
 package com.github.cfogrady.vb.dim.reader.writer;
 
 import com.github.cfogrady.vb.dim.reader.ByteUtils;
+import com.github.cfogrady.vb.dim.reader.RawChecksumBuilder;
 import com.github.cfogrady.vb.dim.reader.content.SpriteData;
 import com.github.cfogrady.vb.dim.reader.reader.SpriteChecksumBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +13,7 @@ import java.util.List;
 
 @Slf4j
 public class SpriteWriter {
-    public static final int SPRITE_SECTION_START = 0x100000;
+    public static final int SPRITE_SECTION_START = 0x100_000;
     public static void writeSpriteData(SpriteData spriteData, boolean hasSpriteSigning, OutputStreamWithNot outputStreamWithNot) throws IOException {
         outputStreamWithNot.writeZerosUntilOffset(SPRITE_SECTION_START);
         if(hasSpriteSigning) {
@@ -25,6 +26,23 @@ public class SpriteWriter {
             }
         } else {
             writeUnmodified(spriteData, outputStreamWithNot);
+        }
+
+    }
+
+    private void writeSpriteDataToMatchChecksum(OutputStreamWithNot outputStreamWithNot, SpriteData spriteData) {
+        SpriteChecksumBuilder spriteChecksumBuilder = new SpriteChecksumBuilder();
+        InMemoryOutputStream inMemoryOutputStream = new InMemoryOutputStream(spriteChecksumBuilder, SPRITE_SECTION_START);
+        int potentialSpriteStartLocation = 0x100_048 + 4 + 4*spriteData.getSprites().size(); // start location + count int + pointer int per sprite
+        boolean currentlyInSignedAreay = SpriteChecksumBuilder.isPartOfChecksum(potentialSpriteStartLocation);
+        RawChecksumBuilder rawChecksumBuilder = new RawChecksumBuilder();
+        byte[] areaToChecksum = new byte[0x1000];
+        int index = 0;
+        for(SpriteData.Sprite sprite : spriteData.getSprites()) {
+            int spriteSizeInBytes = sprite.getHeight() * sprite.getWidth() * 2;
+            if(SpriteChecksumBuilder.includesChecksumArea(potentialSpriteStartLocation, spriteSizeInBytes)) {
+
+            }
         }
 
     }
