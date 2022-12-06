@@ -2,7 +2,7 @@ package com.github.cfogrady.vb.dim.reader.reader;
 
 
 import com.github.cfogrady.vb.dim.reader.ByteUtils;
-import com.github.cfogrady.vb.dim.reader.ChecksumBuilder;
+import com.github.cfogrady.vb.dim.reader.DIMChecksumBuilder;
 import com.github.cfogrady.vb.dim.reader.content.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,7 +16,7 @@ public class DimReader {
     public static final int NONE_VALUE = 65535;
 
     public DimContent readDimData(InputStream inputStream, boolean verifyChecksum) {
-        ChecksumBuilder checksumBuilder = new ChecksumBuilder();
+        DIMChecksumBuilder checksumBuilder = new DIMChecksumBuilder();
         SpriteChecksumBuilder spriteChecksumBuilder = new SpriteChecksumBuilder();
         try {
             InputStreamWithNot inputStreamWithNot = InputStreamWithNot.wrap(inputStream, checksumBuilder, spriteChecksumBuilder);

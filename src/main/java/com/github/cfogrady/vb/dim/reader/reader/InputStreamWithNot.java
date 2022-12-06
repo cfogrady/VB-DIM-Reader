@@ -1,7 +1,7 @@
 package com.github.cfogrady.vb.dim.reader.reader;
 
 import com.github.cfogrady.vb.dim.reader.ByteUtils;
-import com.github.cfogrady.vb.dim.reader.ChecksumBuilder;
+import com.github.cfogrady.vb.dim.reader.DIMChecksumBuilder;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
@@ -11,10 +11,10 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 class InputStreamWithNot {
     private final InputStream inputStream;
-    private final ChecksumBuilder checksumBuilder;
+    private final DIMChecksumBuilder checksumBuilder;
     private final SpriteChecksumBuilder spriteChecksumBuilder;
     private int location = 0;
-    public static InputStreamWithNot wrap(InputStream inputStream, ChecksumBuilder checksumBuilder, SpriteChecksumBuilder spriteChecksumBuilder) {
+    public static InputStreamWithNot wrap(InputStream inputStream, DIMChecksumBuilder checksumBuilder, SpriteChecksumBuilder spriteChecksumBuilder) {
         return new InputStreamWithNot(inputStream, checksumBuilder, spriteChecksumBuilder);
     }
 

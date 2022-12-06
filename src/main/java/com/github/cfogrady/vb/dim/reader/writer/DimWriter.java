@@ -2,10 +2,9 @@ package com.github.cfogrady.vb.dim.reader.writer;
 
 
 import com.github.cfogrady.vb.dim.reader.ByteUtils;
-import com.github.cfogrady.vb.dim.reader.ChecksumBuilder;
+import com.github.cfogrady.vb.dim.reader.DIMChecksumBuilder;
 import com.github.cfogrady.vb.dim.reader.content.*;
 import com.github.cfogrady.vb.dim.reader.reader.DimReader;
-import com.github.cfogrady.vb.dim.reader.reader.SpriteChecksumBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -18,7 +17,7 @@ public class DimWriter {
     public static final int NONE_VALUE = DimReader.NONE_VALUE;
 
     public void writeDimData(DimContent dimContent, OutputStream outputStream) {
-        ChecksumBuilder checksumBuilder = new ChecksumBuilder();
+        DIMChecksumBuilder checksumBuilder = new DIMChecksumBuilder();
         OutputStreamWithNot outputStreamWithNot = OutputStreamWithNot.wrap(outputStream, checksumBuilder);
         try {
             HeaderWriter.writeHeader(dimContent.getDimHeader(), outputStreamWithNot);
