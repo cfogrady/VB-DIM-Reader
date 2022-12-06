@@ -39,7 +39,9 @@ public class SpriteChecksumBuilder {
     private boolean isPartOfChecksum(int location) {
         int relativeLoc = location - CHECKSUM_START_LOCATION;
         int locInChunk = relativeLoc % CHUNK_SIZE;
-        if(locInChunk < CHUNK_CHECKSUM_PORTION && relativeLoc / CHUNK_SIZE < NUMBER_OF_CHUNKS) {
+        if(location > CHECKSUM_START_LOCATION &&
+                locInChunk < CHUNK_CHECKSUM_PORTION &&
+                relativeLoc / CHUNK_SIZE < NUMBER_OF_CHUNKS) {
             return true;
         }
         return false;
