@@ -1,6 +1,7 @@
 package com.github.cfogrady.vb.dim.reader.reader;
 
 import com.github.cfogrady.vb.dim.reader.ByteUtils;
+import com.github.cfogrady.vb.dim.reader.RawChecksumBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -12,12 +13,12 @@ public class SpriteChecksumBuilder {
     public static final int CHECKSUM_START_LOCATION = 0x102000;
     public static final int CHUNK_CHECKSUM_PORTION = 0x1000;
 
-    private final ArrayList<Integer> checksums;
+    private final ArrayList<RawChecksumBuilder> checksumBuilders;
 
     public SpriteChecksumBuilder() {
-        checksums = new ArrayList<>();
+        checksumBuilders = new ArrayList<>();
         for(int i = 0; i < NUMBER_OF_CHUNKS; i++) {
-            checksums.add(0);
+            checksumBuilders.add(new RawChecksumBuilder());
         }
     }
 
@@ -31,15 +32,27 @@ public class SpriteChecksumBuilder {
         }
     }
 
-    private int calculateWhichChunk(int location) {
+    private static boolean isAfterChecksumStart(int location) {
+        return location > CHECKSUM_START_LOCATION;
+    }
+
+    private static int calculateWhichChunk(int location) {
         int relativeLoc = location - CHECKSUM_START_LOCATION;
         return relativeLoc / CHUNK_SIZE;
     }
 
-    private boolean isPartOfChecksum(int location) {
+    public static int distanceUntilChecksumPortion(int location) {
+        
+    }
+
+    public static int distanceUntilExitChecksumPortion(int location) {
+
+    }
+
+    public static boolean isPartOfChecksum(int location) {
         int relativeLoc = location - CHECKSUM_START_LOCATION;
         int locInChunk = relativeLoc % CHUNK_SIZE;
-        if(location > CHECKSUM_START_LOCATION &&
+        if(isAfterChecksumStart(location) &&
                 locInChunk < CHUNK_CHECKSUM_PORTION &&
                 relativeLoc / CHUNK_SIZE < NUMBER_OF_CHUNKS) {
             return true;
@@ -47,12 +60,35 @@ public class SpriteChecksumBuilder {
         return false;
     }
 
+    public static boolean includesChecksumArea(int location, int size) {
+        int lastByte = location + (size-1);
+        if(isPartOfChecksum(location)) {
+            return true;
+        }
+        if(isPartOfChecksum(lastByte)) {
+            return true;
+        }
+        if(calculateWhichChunk(location) != calculateWhichChunk(lastByte)) {
+            //if we transitioned to a new chunk then we encapsulated an entire area just in this sprite
+            return true;
+        }
+        if(isAfterChecksumStart(location) != isAfterChecksumStart(lastByte)) {
+            //checks for a -0 to 0 type situation.
+            return true;
+        }
+        return false;
+    }
+
     private void add16BitInt(int value, int location) {
         int chunk = calculateWhichChunk(location);
-        checksums.set(chunk, (checksums.get(chunk) + value) & 0xFFFF);
+        checksumBuilders.get(chunk).add16BitInt(value);
     }
 
     public ArrayList<Integer> getChecksums() {
-        return checksums;
+        ArrayList<Integer> currentChecksums = new ArrayList<>();
+        for(RawChecksumBuilder rawChecksumBuilder : checksumBuilders) {
+            currentChecksums.add(rawChecksumBuilder.getChecksum());
+        }
+        return currentChecksums;
     }
 }
