@@ -22,6 +22,10 @@ public class SpriteData {
 		private final int height;
 		private final byte[] pixelData; //16-bit R5G6B5
 
+		public int getByteCountAt16BitPerPixel() {
+			return pixelData.length;
+		}
+
 		public byte[] get24BitRGB() {
 			byte[] rgb = new byte[(pixelData.length/2)*3];
 			for(int pixel = 0; pixel < width*height; pixel++) {

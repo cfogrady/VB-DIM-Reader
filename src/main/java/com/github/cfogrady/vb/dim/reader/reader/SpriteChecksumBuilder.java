@@ -41,12 +41,20 @@ public class SpriteChecksumBuilder {
         return relativeLoc / CHUNK_SIZE;
     }
 
-    public static int distanceUntilChecksumPortion(int location) {
-        
+    public static int nextChecksumPortion(int location) {
+        int relativeLoc = location - CHECKSUM_START_LOCATION;
+        int currentLocationChunk = relativeLoc / CHUNK_SIZE;
+        return ((currentLocationChunk + 1) * CHUNK_SIZE) + CHECKSUM_START_LOCATION;
     }
 
-    public static int distanceUntilExitChecksumPortion(int location) {
-
+    public static int nextChecksumEnd(int location) {
+        int relativeLoc = location - CHECKSUM_START_LOCATION;
+        int locInChunk = relativeLoc % CHUNK_SIZE;
+        int currentLocationChunk = relativeLoc / CHUNK_SIZE;
+        if(locInChunk >= CHUNK_CHECKSUM_PORTION) {
+            currentLocationChunk++;
+        }
+        return currentLocationChunk * CHUNK_SIZE + CHUNK_CHECKSUM_PORTION + CHECKSUM_START_LOCATION;
     }
 
     public static boolean isPartOfChecksum(int location) {

@@ -8,12 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 public class SpriteWriter {
     public static final int SPRITE_SECTION_START = 0x100_000;
+    public static final int PIXEL_POINTER_TABLE_START = 0x100_04C;
     public static void writeSpriteData(SpriteData spriteData, boolean hasSpriteSigning, OutputStreamWithNot outputStreamWithNot) throws IOException {
         outputStreamWithNot.writeZerosUntilOffset(SPRITE_SECTION_START);
         if(hasSpriteSigning) {
@@ -22,7 +22,7 @@ public class SpriteWriter {
             if(areSpriteChecksumsEqual(spriteChecksumBuilder.getChecksums(), spriteData.getSpriteChecksums())) {
                 outputStreamWithNot.writeBytes(inMemoryOutputStream.getBytes());
             } else {
-                //do the weave!!!!
+                writeSpriteDataToMatchChecksum(outputStreamWithNot, spriteData);
             }
         } else {
             writeUnmodified(spriteData, outputStreamWithNot);
@@ -30,21 +30,59 @@ public class SpriteWriter {
 
     }
 
-    private void writeSpriteDataToMatchChecksum(OutputStreamWithNot outputStreamWithNot, SpriteData spriteData) {
+    private static void writeSpriteDataToMatchChecksum(OutputStreamWithNot outputStreamWithNot, SpriteData spriteData) throws IOException {
+        // this is kind of like the knapsack problem. I'm taking a greedy approach, but if we really needed to optimize,
+        // it might be worth brushing up on the knapsack problem and look at rearranging sprites so smaller sprites
+        // went where they fit between checksum areas even if it meant sprites were out of order.
         SpriteChecksumBuilder spriteChecksumBuilder = new SpriteChecksumBuilder();
-        InMemoryOutputStream inMemoryOutputStream = new InMemoryOutputStream(spriteChecksumBuilder, SPRITE_SECTION_START);
-        int potentialSpriteStartLocation = 0x100_048 + 4 + 4*spriteData.getSprites().size(); // start location + count int + pointer int per sprite
-        boolean currentlyInSignedAreay = SpriteChecksumBuilder.isPartOfChecksum(potentialSpriteStartLocation);
+        int potentialSpriteStartLocation = PIXEL_POINTER_TABLE_START + 4*spriteData.getSprites().size(); // start location + count int + pointer int per sprite
+        ArrayList<Integer> pointerTable = createDefaultPointerTable(spriteData);
+        InMemoryOutputStream inMemoryPixelDataOutputStream = new InMemoryOutputStream(spriteChecksumBuilder, potentialSpriteStartLocation);
+        boolean currentlyInSignedArea = false;
         RawChecksumBuilder rawChecksumBuilder = new RawChecksumBuilder();
         byte[] areaToChecksum = new byte[0x1000];
-        int index = 0;
-        for(SpriteData.Sprite sprite : spriteData.getSprites()) {
-            int spriteSizeInBytes = sprite.getHeight() * sprite.getWidth() * 2;
-            if(SpriteChecksumBuilder.includesChecksumArea(potentialSpriteStartLocation, spriteSizeInBytes)) {
-
+        for(int index = 0 ; index < spriteData.getSprites().size(); index++) {
+            SpriteData.Sprite sprite = spriteData.getSprites().get(index);
+            if(currentlyInSignedArea) {
+                //sharing a checksum area with a previous sprite
+                //this may not be needed depending on how we continue / backtrack
+            } else if(checkSumStartsInSprite(potentialSpriteStartLocation, sprite)) {
+                int checksumStartLocation = SpriteChecksumBuilder.nextChecksumPortion(potentialSpriteStartLocation);
+                int checksumEndLocation = SpriteChecksumBuilder.nextChecksumEnd(checksumStartLocation);
+                if(checksumEndLocation <= potentialSpriteStartLocation + sprite.getByteCountAt16BitPerPixel()) {
+                    //fully encompassed within this sprite
+                    // test checksum portion against known checksum. If good, continue.
+                    // If bad, push checksum up to checksum start+2, check if sprite still goes past end.
+                    // If so, calculate checksum offset, and write it. If sprite went past end before, then moving
+                    // the start of the sprite up will gaurantee that the end of the sprite is still past the end of the
+                    // checksum.
+                } else {
+                    // copy portion of sprite that fits into checksum. Add next sprite. checksum matches, write and continue
+                    // If not add space between this sprite and next sprite and calculate checksum offset
+                }
+            } else {
+                //we don't start in a checksum, and we don't enter a checksum
+                pointerTable.set(index, potentialSpriteStartLocation);
+                inMemoryPixelDataOutputStream.writeBytes(sprite.getPixelData());
+                potentialSpriteStartLocation += sprite.getByteCountAt16BitPerPixel();
             }
         }
+    }
 
+    private static boolean checkSumStartsInSprite(int spriteStartLocation, SpriteData.Sprite sprite) {
+        int spriteEndLocation = spriteStartLocation + sprite.getByteCountAt16BitPerPixel();
+        return SpriteChecksumBuilder.nextChecksumPortion(spriteStartLocation) < spriteEndLocation;
+
+    }
+
+    private static ArrayList<Integer> createDefaultPointerTable(SpriteData spriteData) {
+        ArrayList<Integer> pointerTable = new ArrayList<>(spriteData.getSprites().size());
+        int pixelStartLocation = PIXEL_POINTER_TABLE_START + 4*pointerTable.size();
+        for(SpriteData.Sprite sprite : spriteData.getSprites()) {
+            pointerTable.add(pixelStartLocation);
+            pixelStartLocation += sprite.getByteCountAt16BitPerPixel();
+        }
+        return pointerTable;
     }
 
     private static int calculateFinalOffset(int offsetUntilFirstSprite, List<SpriteData.Sprite> sprites) {
