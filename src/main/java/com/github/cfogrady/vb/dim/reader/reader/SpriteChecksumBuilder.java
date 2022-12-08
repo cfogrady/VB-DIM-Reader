@@ -12,6 +12,7 @@ public class SpriteChecksumBuilder {
     public static final int CHUNK_SIZE = 0x10000;
     public static final int CHECKSUM_START_LOCATION = 0x102000;
     public static final int CHUNK_CHECKSUM_PORTION = 0x1000;
+    static final int WORD_SPACE = (int) Math.pow(2, 16);
 
     private final ArrayList<RawChecksumBuilder> checksumBuilders;
 
@@ -36,7 +37,7 @@ public class SpriteChecksumBuilder {
         return location > CHECKSUM_START_LOCATION;
     }
 
-    private static int calculateWhichChunk(int location) {
+    public static int calculateWhichChunk(int location) {
         int relativeLoc = location - CHECKSUM_START_LOCATION;
         return relativeLoc / CHUNK_SIZE;
     }
@@ -66,6 +67,17 @@ public class SpriteChecksumBuilder {
             return true;
         }
         return false;
+    }
+
+    public static int calculateChecksumOffset(int expected, int current) {
+        if(expected == current) {
+            return 0;
+        } else if(expected > current) {
+            return expected - current;
+        } else {
+            expected += WORD_SPACE;
+            return expected - current;
+        }
     }
 
     public static boolean includesChecksumArea(int location, int size) {
