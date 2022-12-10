@@ -25,17 +25,26 @@ public class SpriteChecksumHacker {
 
     private int potentialSpriteStartLocation;
     private ArrayList<Integer> pointerTable;
-    private InMemoryOutputStream inMemoryPixelDataOutputStream;
+    private InMemoryOutputStream pixelDataOutputStream;
     private int nextIndexInChecksumArea;
     private RawChecksumBuilder rawChecksumBuilder;
     private byte[] areaToChecksum;
     private SpriteData spriteData;
 
+    public void writeInterweavedSpriteTableAndSpritesWithChecksumFixes(SpriteData spriteData, OutputStreamWithNot mainOutputStream) throws IOException {
+        RelativeByteOffsetOutputStream spritePackageOutputStream = new RelativeByteOffsetOutputStream(mainOutputStream);
+        setupFromSpriteData(spriteData);
+        buildInterweavedSpriteTableAndSpritesWithChecksumFixes();
+        writeMetaToOutput(spriteData, spritePackageOutputStream);
+        writePointerTableToOutput(spritePackageOutputStream);
+        spritePackageOutputStream.writeBytes(pixelDataOutputStream.getBytes());
+    }
+
     private void setupFromSpriteData(SpriteData spriteData) {
         this.spriteData = spriteData;
         potentialSpriteStartLocation = calculateAddressImmediatelyAfterTable();
         pointerTable = createDefaultPointerTable();
-        inMemoryPixelDataOutputStream = new InMemoryOutputStream(potentialSpriteStartLocation);
+        pixelDataOutputStream = new InMemoryOutputStream(potentialSpriteStartLocation);
         nextIndexInChecksumArea = 0;
         rawChecksumBuilder = new RawChecksumBuilder();
         areaToChecksum = new byte[checksumSize];
@@ -55,14 +64,6 @@ public class SpriteChecksumHacker {
     private int calculateAddressImmediatelyAfterTable() {
         //start of table + int pointer per sprite + int pointer to termination bytes
         return pixelPointerTableStart + 4*pointerTable.size() + 4;
-    }
-
-    public void writeInterweavedSpriteTableAndSpritesWithChecksumFixes(SpriteData spriteData, OutputStreamWithNot outputStreamWithNot) throws IOException {
-        setupFromSpriteData(spriteData);
-        buildInterweavedSpriteTableAndSpritesWithChecksumFixes();
-        //write headers
-        writePointerTableToOutput(outputStreamWithNot);
-        outputStreamWithNot.writeBytes(inMemoryPixelDataOutputStream.getBytes());
     }
 
     private void buildInterweavedSpriteTableAndSpritesWithChecksumFixes() throws IOException {
@@ -87,10 +88,10 @@ public class SpriteChecksumHacker {
                     int expectedChecksum = getExpectedChecksumForCurrentBlock();
                     if(checksumForNormalWrite == expectedChecksum) {
                         //checksum matches so no need to move anything, write normally
-                        writeSpriteToOutput(index, sprite);
+                        writeSpriteToInMemoryOutput(index, sprite);
                     } else {
                         // If bad, push checksum up to checksum start+2
-                        writeSpriteToOutputWithChecksumOffset(index, sprite, expectedChecksum, potentialSpriteStartLocation, nextIndexInChecksumArea);
+                        writeSpriteToInMemoryOutputWithChecksumOffset(index, sprite, expectedChecksum, potentialSpriteStartLocation, nextIndexInChecksumArea);
                         nextIndexInChecksumArea = 0;
                     }
                 } else if (index == spriteData.getSprites().size()) {
@@ -100,7 +101,7 @@ public class SpriteChecksumHacker {
                     int bytesInSprite = sprite.getByteCountAt16BitPerPixel();
                     copyBytes(sprite.getPixelData(), 0, areaToChecksum, nextIndexInChecksumArea, bytesInSprite);
                     nextIndexInChecksumArea += bytesInSprite;
-                    writeSpriteToOutput(index, sprite);
+                    writeSpriteToInMemoryOutput(index, sprite);
                 }
             } else if(checksumStartsInSprite(sprite)) {
                 int checksumStartLocation = SpriteChecksumBuilder.nextChecksumPortion(potentialSpriteStartLocation);
@@ -112,10 +113,10 @@ public class SpriteChecksumHacker {
                     int checksumForNormalWrite = getChunkChecksumForNormalSpriteWrite(checksumStartLocation, sprite);
                     if(checksumForNormalWrite == expectedChecksum) {
                         //checksum matches so no need to move anything, write normally
-                        writeSpriteToOutput(index, sprite);
+                        writeSpriteToInMemoryOutput(index, sprite);
                     } else {
                         // If bad, push checksum up to checksum start+2
-                        writeSpriteToOutputWithChecksumOffset(index, sprite, expectedChecksum, checksumStartLocation, 0);
+                        writeSpriteToInMemoryOutputWithChecksumOffset(index, sprite, expectedChecksum, checksumStartLocation, 0);
                     }
                 } else if(index == spriteData.getSprites().size()) {
                     // Sprite only covers part of the checksum area, but this is the last sprite
@@ -126,24 +127,38 @@ public class SpriteChecksumHacker {
                     copyBytes(sprite.getPixelData(), startOfSpriteInChecksum, areaToChecksum, 0, bytesInChecksumArea);
                     nextIndexInChecksumArea = bytesInChecksumArea;
                     // We add the sprite here. If the checksum is no good we'll add an offset between this sprite and the next.
-                    writeSpriteToOutput(index, sprite);
+                    writeSpriteToInMemoryOutput(index, sprite);
                 }
             } else {
                 //we don't start in a checksum, and we don't enter a checksum, so just write normally
-                writeSpriteToOutput(index, sprite);
+                writeSpriteToInMemoryOutput(index, sprite);
             }
         }
     }
 
-    private void writePointerTableToOutput(OutputStreamWithNot outputStreamWithNot) throws IOException {
+    private void writeMetaToOutput(SpriteData spriteData, ByteOffsetOutputStream outputStream) throws IOException {
+        outputStream.writeBytes(spriteData.getText().getBytes());
+        outputStream.writeZerosUntilOffset(SpriteWriter.TERMINATION_BYTES_OF_POINTER_TABLE);
+        //location of first offset sprite = int pointer for each sprite + int pointer for the termination bytes
+        int firstSpritePointer = pointerTable.get(0);
+        int terminationBytesPointer = pointerTable.get(pointerTable.size()-1);
+        outputStream.writeBytes(ByteUtils.convert32BitIntToBytes(terminationBytesPointer));
+        outputStream.writeZerosUntilOffset(SpriteWriter.TABLE_START);
+        outputStream.writeBytes(ByteUtils.convert32BitIntToBytes(1)); // 0x40
+        //pointer to number of sprites
+        outputStream.writeBytes(ByteUtils.convert32BitIntToBytes(SpriteWriter.NUMBER_OF_SPRITES_LOCATION)); // 0x44
+        outputStream.writeBytes(ByteUtils.convert32BitIntToBytes(spriteData.getSprites().size())); // 0x48
+    }
+
+    private void writePointerTableToOutput(ByteOffsetOutputStream outputStream) throws IOException {
         for(Integer pointer : pointerTable) {
-            outputStreamWithNot.writeInt(pointer);
+            outputStream.writeInt(pointer);
         }
     }
 
-    private void writeSpriteToOutput(int index, SpriteData.Sprite sprite) throws IOException {
+    private void writeSpriteToInMemoryOutput(int index, SpriteData.Sprite sprite) throws IOException {
         pointerTable.set(index, potentialSpriteStartLocation);
-        inMemoryPixelDataOutputStream.writeBytes(sprite.getPixelData());
+        pixelDataOutputStream.writeBytes(sprite.getPixelData());
         potentialSpriteStartLocation += sprite.getByteCountAt16BitPerPixel();
     }
 
@@ -162,20 +177,21 @@ public class SpriteChecksumHacker {
     }
 
     private void writeFinalSpriteToOutputWithChecksumOffset(int index, SpriteData.Sprite sprite, int expectedChecksum, int checksumStartLocation, int areaToChecksumOffset) throws IOException{
-        //final package means the termination bytes, which means they probably have to go at the end of the signature
+        // We can always put the checksum fix before the sprite for this case.
+        // Final package means the termination bytes, which means they probably have to go at the end of the signature
     }
 
-    private void writeSpriteToOutputWithChecksumOffset(int index, SpriteData.Sprite sprite, int expectedChecksum, int checksumStartLocation, int areaToChecksumOffset) throws IOException {
+    private void writeSpriteToInMemoryOutputWithChecksumOffset(int index, SpriteData.Sprite sprite, int expectedChecksum, int checksumStartLocation, int areaToChecksumOffset) throws IOException {
         areaToChecksum[areaToChecksumOffset] = 0;
         areaToChecksum[areaToChecksumOffset + 1] = 0;
         copyBytes(sprite.getPixelData(), 0, areaToChecksum, 2, areaToChecksum.length-(2 + areaToChecksumOffset));
         rawChecksumBuilder.reset();
         rawChecksumBuilder.addBytes(areaToChecksum);
         int checksumOffset = SpriteChecksumBuilder.calculateChecksumOffset(expectedChecksum, rawChecksumBuilder.getChecksum());
-        inMemoryPixelDataOutputStream.writeZerosUntilOffset(checksumStartLocation);
-        inMemoryPixelDataOutputStream.write16BitInt(checksumOffset);
+        pixelDataOutputStream.writeZerosUntilOffset(checksumStartLocation);
+        pixelDataOutputStream.write16BitInt(checksumOffset);
         //assumes that a single sprite will never cross multiple checksum areas.
-        inMemoryPixelDataOutputStream.writeBytes(sprite.getPixelData());
+        pixelDataOutputStream.writeBytes(sprite.getPixelData());
         pointerTable.set(index, checksumStartLocation + 2);
         potentialSpriteStartLocation = checksumStartLocation+2 + sprite.getByteCountAt16BitPerPixel();
     }
