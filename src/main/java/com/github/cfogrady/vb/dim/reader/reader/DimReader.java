@@ -17,9 +17,8 @@ public class DimReader {
 
     public DimContent readDimData(InputStream inputStream, boolean verifyChecksum) {
         DIMChecksumBuilder checksumBuilder = new DIMChecksumBuilder();
-        SpriteChecksumBuilder spriteChecksumBuilder = new SpriteChecksumBuilder();
         try {
-            InputStreamWithNot inputStreamWithNot = InputStreamWithNot.wrap(inputStream, checksumBuilder, spriteChecksumBuilder);
+            InputStreamWithNot inputStreamWithNot = InputStreamWithNot.wrap(inputStream, checksumBuilder);
             byte[] bytes = inputStreamWithNot.readNBytes(0x1030);
             DimHeader header = DimHeaderReader.dimHeaderFromBytes(bytes);
             inputStreamWithNot.readToOffset(0x30000); // skip everything until stats section
@@ -38,7 +37,7 @@ public class DimReader {
             inputStreamWithNot.readToOffset(0x3FFFFE);
             bytes = inputStreamWithNot.readNBytes(2);
             int dimChecksum = ByteUtils.getUnsigned16Bit(bytes)[0];
-            int calculatedChecksum = checksumBuilder.getCheckSum();
+            int calculatedChecksum = inputStreamWithNot.getChecksum();
             if(dimChecksum != calculatedChecksum) {
                 log.warn("Checksums don't match! Calculated: {} Received: {}", Integer.toHexString(calculatedChecksum), Integer.toHexString(dimChecksum));
                 if(verifyChecksum) {

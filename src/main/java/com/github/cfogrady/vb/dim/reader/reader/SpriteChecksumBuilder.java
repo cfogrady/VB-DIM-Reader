@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class SpriteChecksumBuilder {
     public static final int NUMBER_OF_CHUNKS = 28;
     public static final int CHUNK_SIZE = 0x10000;
-    public static final int CHECKSUM_START_LOCATION = 0x102000;
+    public static final int RELATIVE_CHECKSUM_START_LOCATION = 0x2000; //relative to start of sprite package
     public static final int CHUNK_CHECKSUM_PORTION = 0x1000;
     static final int WORD_SPACE = (int) Math.pow(2, 16);
 
@@ -23,47 +23,47 @@ public class SpriteChecksumBuilder {
         }
     }
 
-    public void addBytes(byte[] bytes, int currentLocation) {
+    public void addBytes(byte[] bytes, int currentRelativeLocation) {
         int[] unsigned16BitValues = ByteUtils.getUnsigned16Bit(bytes);
         for(int i = 0; i < unsigned16BitValues.length; i++) {
-            int wordLocation = currentLocation + i*2;
+            int wordLocation = currentRelativeLocation + i*2;
             if(isPartOfChecksum(wordLocation)) {
                 add16BitInt(unsigned16BitValues[i], wordLocation);
             }
         }
     }
 
-    private static boolean isAfterChecksumStart(int location) {
-        return location > CHECKSUM_START_LOCATION;
+    private static boolean isAfterChecksumStart(int relativeLocation) {
+        return relativeLocation > RELATIVE_CHECKSUM_START_LOCATION;
     }
 
-    public static int calculateWhichChunk(int location) {
-        int relativeLoc = location - CHECKSUM_START_LOCATION;
+    public static int calculateWhichChunk(int relativeLocation) {
+        int relativeLoc = relativeLocation - RELATIVE_CHECKSUM_START_LOCATION;
         return relativeLoc / CHUNK_SIZE;
     }
 
-    public static int nextChecksumPortion(int location) {
-        int relativeLoc = location - CHECKSUM_START_LOCATION;
+    public static int nextChecksumPortion(int relativeLocation) {
+        int relativeLoc = relativeLocation - RELATIVE_CHECKSUM_START_LOCATION;
         int currentLocationChunk = relativeLoc / CHUNK_SIZE;
-        return ((currentLocationChunk + 1) * CHUNK_SIZE) + CHECKSUM_START_LOCATION;
+        return ((currentLocationChunk + 1) * CHUNK_SIZE) + RELATIVE_CHECKSUM_START_LOCATION;
     }
 
-    public static int nextChecksumEnd(int location) {
-        int relativeLoc = location - CHECKSUM_START_LOCATION;
-        int locInChunk = relativeLoc % CHUNK_SIZE;
-        int currentLocationChunk = relativeLoc / CHUNK_SIZE;
+    public static int nextChecksumEnd(int relativeLocation) {
+        int locationRelativeToChecksumStart = relativeLocation - RELATIVE_CHECKSUM_START_LOCATION;
+        int locInChunk = locationRelativeToChecksumStart % CHUNK_SIZE;
+        int currentLocationChunk = locationRelativeToChecksumStart / CHUNK_SIZE;
         if(locInChunk >= CHUNK_CHECKSUM_PORTION) {
             currentLocationChunk++;
         }
-        return currentLocationChunk * CHUNK_SIZE + CHUNK_CHECKSUM_PORTION + CHECKSUM_START_LOCATION;
+        return currentLocationChunk * CHUNK_SIZE + CHUNK_CHECKSUM_PORTION + RELATIVE_CHECKSUM_START_LOCATION;
     }
 
-    public static boolean isPartOfChecksum(int location) {
-        int relativeLoc = location - CHECKSUM_START_LOCATION;
-        int locInChunk = relativeLoc % CHUNK_SIZE;
-        if(isAfterChecksumStart(location) &&
+    public static boolean isPartOfChecksum(int relativeLocation) {
+        int locationRelativeToChecksumStart = relativeLocation - RELATIVE_CHECKSUM_START_LOCATION;
+        int locInChunk = locationRelativeToChecksumStart % CHUNK_SIZE;
+        if(isAfterChecksumStart(relativeLocation) &&
                 locInChunk < CHUNK_CHECKSUM_PORTION &&
-                relativeLoc / CHUNK_SIZE < NUMBER_OF_CHUNKS) {
+                locationRelativeToChecksumStart / CHUNK_SIZE < NUMBER_OF_CHUNKS) {
             return true;
         }
         return false;
@@ -80,27 +80,8 @@ public class SpriteChecksumBuilder {
         }
     }
 
-    public static boolean includesChecksumArea(int location, int size) {
-        int lastByte = location + (size-1);
-        if(isPartOfChecksum(location)) {
-            return true;
-        }
-        if(isPartOfChecksum(lastByte)) {
-            return true;
-        }
-        if(calculateWhichChunk(location) != calculateWhichChunk(lastByte)) {
-            //if we transitioned to a new chunk then we encapsulated an entire area just in this sprite
-            return true;
-        }
-        if(isAfterChecksumStart(location) != isAfterChecksumStart(lastByte)) {
-            //checks for a -0 to 0 type situation.
-            return true;
-        }
-        return false;
-    }
-
-    private void add16BitInt(int value, int location) {
-        int chunk = calculateWhichChunk(location);
+    private void add16BitInt(int value, int relativeLocation) {
+        int chunk = calculateWhichChunk(relativeLocation);
         checksumBuilders.get(chunk).add16BitInt(value);
     }
 

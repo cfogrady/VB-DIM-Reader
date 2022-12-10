@@ -2,6 +2,8 @@ package com.github.cfogrady.vb.dim.reader.content;
 
 import java.util.List;
 
+import com.github.cfogrady.vb.dim.reader.ByteUtils;
+import com.github.cfogrady.vb.dim.reader.writer.SpriteWriter;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;

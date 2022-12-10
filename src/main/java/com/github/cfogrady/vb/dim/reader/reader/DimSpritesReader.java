@@ -8,13 +8,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.github.cfogrady.vb.dim.reader.writer.SpriteWriter.NUMBER_OF_SPRITES_LOCATION;
+
 @Slf4j
 class DimSpritesReader {
-    static SpriteData spriteDataFromBytesAndStream(byte[] spriteDimensionBytes, InputStreamWithNot spriteDataSection) throws IOException {
+    static SpriteData spriteDataFromBytesAndStream(byte[] spriteDimensionBytes, InputStreamWithNot generalInputStream) throws IOException {
+        SpriteChecksumBuilder spriteChecksumBuilder = new SpriteChecksumBuilder();
+        SpritePackageInputStream spriteDataSection = new SpritePackageInputStream(generalInputStream, spriteChecksumBuilder);
         int[] spriteDimensions = ByteUtils.getUnsigned16Bit(spriteDimensionBytes);
         String text = new String(spriteDataSection.readNBytes(0x18));
         int finalOffset = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes(4))[0];
-        spriteDataSection.readToOffset(0x100048);
+        spriteDataSection.readToOffset(NUMBER_OF_SPRITES_LOCATION);
         int numberOfSprites = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes(4))[0];
         int[] pointers = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes((numberOfSprites+1)*4));
         int endSignalLocation = pointers[pointers.length-1];
@@ -25,7 +29,7 @@ class DimSpritesReader {
         int currentOffset = pointers[0];
         for(int i = 0; i < numberOfSprites; i++)
         {
-            spriteDataSection.readToOffset(currentOffset + 0x100000);
+            spriteDataSection.readToOffset(currentOffset);
             if(pointers[i+1] - currentOffset <= 0) {
                 throw new IllegalStateException("Unable to handle case where sprites are not in order. If this is an official DIM please raise an issue at https://github.com/cfogrady/VB-DIM-Reader/issues");
             }
