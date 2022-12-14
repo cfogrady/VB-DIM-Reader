@@ -22,6 +22,7 @@ public class RelativeByteOffsetOutputStream implements ByteOffsetOutputStream {
 
     @Override
     public void writeBytes(byte[] bytes) throws IOException {
+        location += bytes.length;
         byteOffsetOutputStream.writeBytes(bytes);
     }
 }
