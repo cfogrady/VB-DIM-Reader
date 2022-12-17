@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -89,6 +91,7 @@ public class SpriteChecksumHacker {
                     rawChecksumBuilder.addBytes(areaToChecksum);
                     int checksumForNormalWrite = rawChecksumBuilder.getChecksum();
                     int expectedChecksum = getExpectedChecksumForCurrentBlock();
+                    //writeBytesToFile(areaToChecksum, index + "_ChecksumSectionPlain.bin");
                     if(checksumForNormalWrite == expectedChecksum) {
                         //checksum matches so no need to move anything, write normally
                         writeSpriteToInMemoryOutput(index, sprite);
@@ -114,6 +117,7 @@ public class SpriteChecksumHacker {
                     //fully encompassed within this sprite
                     int expectedChecksum = getExpectedChecksumForNextBlock(); //this sprite starts out of the block and enters the next block
                     int checksumForNormalWrite = getChunkChecksumForNormalSpriteWrite(checksumStartLocation, sprite);
+                    //writeBytesToFile(areaToChecksum, index + "_ChecksumSectionPlain.bin");
                     if(checksumForNormalWrite == expectedChecksum) {
                         //checksum matches so no need to move anything, write normally
                         writeSpriteToInMemoryOutput(index, sprite);
@@ -217,13 +221,15 @@ public class SpriteChecksumHacker {
     }
 
     private void writeSpriteToInMemoryOutputWithChecksumOffset(int index, SpriteData.Sprite sprite, int expectedChecksum, int dataStartLocation, int areaToChecksumOffset) throws IOException {
-        log.info("Sprite {} written with offset. DataStarting at: 0x{}", index, Integer.toHexString(dataStartLocation));
+        log.info("Sprite {} written with offset. Checksum Index: {}. DataStarting at: 0x{}", index, SpriteChecksumBuilder.calculateWhichChunk(dataStartLocation) ,Integer.toHexString(dataStartLocation));
         areaToChecksum[areaToChecksumOffset] = 0;
         areaToChecksum[areaToChecksumOffset + 1] = 0;
-        copyBytes(sprite.getPixelData(), 0, areaToChecksum, 2, areaToChecksum.length-(2 + areaToChecksumOffset));
+        copyBytes(sprite.getPixelData(), 0, areaToChecksum, 2+areaToChecksumOffset, areaToChecksum.length-(2 + areaToChecksumOffset));
+        //writeBytesToFile(areaToChecksum, index + "_ChecksumSectionModified.bin");
         rawChecksumBuilder.reset();
         rawChecksumBuilder.addBytes(areaToChecksum);
         int checksumOffset = SpriteChecksumBuilder.calculateChecksumOffset(expectedChecksum, rawChecksumBuilder.getChecksum());
+        log.info("Expected: {} Current: {} Offset: {}", expectedChecksum, rawChecksumBuilder.getChecksum(), checksumOffset);
         pixelDataOutputStream.writeZerosUntilOffset(dataStartLocation); //should be no-op if the dataStartLocation isn't the start of the checksum area
         pixelDataOutputStream.write16BitInt(checksumOffset);
         //assumes that a single sprite will never cross multiple checksum areas.
@@ -249,6 +255,16 @@ public class SpriteChecksumHacker {
         int spriteEndLocation = potentialSpriteStartLocation + sprite.getByteCountAt16BitPerPixel();
         int endChecksumBlock = SpriteChecksumBuilder.nextChecksumEnd(potentialSpriteStartLocation);
         return spriteEndLocation >= endChecksumBlock;
+    }
+
+    private void writeBytesToFile(byte[] bytes, String file) {
+        try(FileOutputStream outputStream = new FileOutputStream(file)) {
+            outputStream.write(bytes);
+        } catch (FileNotFoundException e) {
+            log.error("File Not Found", e);
+        } catch (IOException e) {
+            log.error("IO", e);
+        }
     }
 
     public static class InMemoryOutputStream implements ByteOffsetOutputStream {

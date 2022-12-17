@@ -41,8 +41,8 @@ class DimSpritesReader {
                     .height(height)
                     .pixelData(spriteDataSection.readNBytes(expectedSize))
                     .build();
-            if(sprite.getPixelData().length != pointers[i+1] - currentOffset) {
-                throw new IllegalStateException("Expected sprite size " + sprite.getPixelData().length + " doesn't match delta from current offset " + currentOffset + " to next offset " + pointers[i+1]);
+            if(sprite.getPixelData().length > pointers[i+1] - currentOffset) {
+                throw new IllegalStateException("Expected sprite size " + sprite.getPixelData().length + " is too big to fit between current pointer " + currentOffset + " and next sprite's pointer " + pointers[i+1]);
             }
             currentOffset = pointers[i+1];
             sprites.add(sprite);

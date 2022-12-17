@@ -45,7 +45,14 @@ public class SpriteChecksumBuilder {
     public static int nextChecksumPortion(int relativeLocation) {
         int relativeLoc = relativeLocation - RELATIVE_CHECKSUM_START_LOCATION;
         int currentLocationChunk = relativeLoc / CHUNK_SIZE;
-        return ((currentLocationChunk + 1) * CHUNK_SIZE) + RELATIVE_CHECKSUM_START_LOCATION;
+        if(currentLocationChunk >= NUMBER_OF_CHUNKS-1) {
+            //there is no max portion if we are already in or past the number of chunks
+            log.info("No next location. Returning max value as the next checksum start.");
+            return Integer.MAX_VALUE;
+        }
+        int startsAt = ((currentLocationChunk + 1) * CHUNK_SIZE) + RELATIVE_CHECKSUM_START_LOCATION;
+        log.info("Next Checksum starts at 0x{}. Next index: {}", Integer.toHexString(startsAt), currentLocationChunk + 1);
+        return startsAt;
     }
 
     public static int nextChecksumEnd(int relativeLocation) {
