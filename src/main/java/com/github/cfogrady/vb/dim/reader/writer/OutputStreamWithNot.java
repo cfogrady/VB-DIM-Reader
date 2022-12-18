@@ -1,19 +1,18 @@
 package com.github.cfogrady.vb.dim.reader.writer;
 
 import com.github.cfogrady.vb.dim.reader.ByteUtils;
-import com.github.cfogrady.vb.dim.reader.ChecksumBuilder;
+import com.github.cfogrady.vb.dim.reader.DIMChecksumBuilder;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 @RequiredArgsConstructor
-class OutputStreamWithNot {
+class OutputStreamWithNot implements ByteOffsetOutputStream {
     private final OutputStream outputStream;
-    private final ChecksumBuilder checksumBuilder;
+    private final DIMChecksumBuilder checksumBuilder;
     private int location = 0;
-    public static OutputStreamWithNot wrap(OutputStream outputStream, ChecksumBuilder checksumBuilder) {
+    public static OutputStreamWithNot wrap(OutputStream outputStream, DIMChecksumBuilder checksumBuilder) {
         return new OutputStreamWithNot(outputStream, checksumBuilder);
     }
 

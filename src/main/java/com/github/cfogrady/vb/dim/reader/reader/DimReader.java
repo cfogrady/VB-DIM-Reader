@@ -2,7 +2,7 @@ package com.github.cfogrady.vb.dim.reader.reader;
 
 
 import com.github.cfogrady.vb.dim.reader.ByteUtils;
-import com.github.cfogrady.vb.dim.reader.ChecksumBuilder;
+import com.github.cfogrady.vb.dim.reader.DIMChecksumBuilder;
 import com.github.cfogrady.vb.dim.reader.content.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,7 +16,7 @@ public class DimReader {
     public static final int NONE_VALUE = 65535;
 
     public DimContent readDimData(InputStream inputStream, boolean verifyChecksum) {
-        ChecksumBuilder checksumBuilder = new ChecksumBuilder();
+        DIMChecksumBuilder checksumBuilder = new DIMChecksumBuilder();
         try {
             InputStreamWithNot inputStreamWithNot = InputStreamWithNot.wrap(inputStream, checksumBuilder);
             byte[] bytes = inputStreamWithNot.readNBytes(0x1030);
@@ -37,9 +37,9 @@ public class DimReader {
             inputStreamWithNot.readToOffset(0x3FFFFE);
             bytes = inputStreamWithNot.readNBytes(2);
             int dimChecksum = ByteUtils.getUnsigned16Bit(bytes)[0];
-            int calculatedChecksum = checksumBuilder.getCheckSum();
+            int calculatedChecksum = inputStreamWithNot.getChecksum();
             if(dimChecksum != calculatedChecksum) {
-                log.warn("Checksums don't match!");
+                log.warn("Checksums don't match! Calculated: {} Received: {}", Integer.toHexString(calculatedChecksum), Integer.toHexString(dimChecksum));
                 if(verifyChecksum) {
                     throw new IllegalStateException("Invalid Dim. Calculated checksum doesn't match Dim checksum");
                 }

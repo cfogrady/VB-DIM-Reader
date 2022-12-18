@@ -2,7 +2,7 @@ package com.github.cfogrady.vb.dim.reader.writer;
 
 
 import com.github.cfogrady.vb.dim.reader.ByteUtils;
-import com.github.cfogrady.vb.dim.reader.ChecksumBuilder;
+import com.github.cfogrady.vb.dim.reader.DIMChecksumBuilder;
 import com.github.cfogrady.vb.dim.reader.content.*;
 import com.github.cfogrady.vb.dim.reader.reader.DimReader;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ public class DimWriter {
     public static final int NONE_VALUE = DimReader.NONE_VALUE;
 
     public void writeDimData(DimContent dimContent, OutputStream outputStream) {
-        ChecksumBuilder checksumBuilder = new ChecksumBuilder();
+        DIMChecksumBuilder checksumBuilder = new DIMChecksumBuilder();
         OutputStreamWithNot outputStreamWithNot = OutputStreamWithNot.wrap(outputStream, checksumBuilder);
         try {
             HeaderWriter.writeHeader(dimContent.getDimHeader(), outputStreamWithNot);
@@ -27,7 +27,7 @@ public class DimWriter {
             SpriteDimentionsWriter.writeSpriteDimensions(dimContent.getSpriteData(), outputStreamWithNot);
             FusionsWriter.writeFusions(dimContent.getDimFusions(), outputStreamWithNot);
             SpecificFusionsWriter.writeSpecificFusions(dimContent.getDimSpecificFusion(), outputStreamWithNot);
-            SpriteWriter.writeSpriteData(dimContent.getSpriteData(), outputStreamWithNot);
+            SpriteWriter.writeSpriteData(dimContent.getSpriteData(), dimContent.getDimHeader().hasSpriteSignature(), outputStreamWithNot);
             outputStreamWithNot.writeZerosUntilOffset(0x3ffffe);
             outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(outputStreamWithNot.getChecksum()));
         } catch (IOException e) {
