@@ -8,21 +8,31 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.github.cfogrady.vb.dim.reader.writer.SpriteWriter.NUMBER_OF_SPRITES_LOCATION;
+
 @Slf4j
 class DimSpritesReader {
-    static SpriteData spriteDataFromBytesAndStream(byte[] spriteDimensionBytes, InputStreamWithNot spriteDataSection) throws IOException {
+    static SpriteData spriteDataFromBytesAndStream(byte[] spriteDimensionBytes, InputStreamWithNot generalInputStream) throws IOException {
+        SpriteChecksumBuilder spriteChecksumBuilder = new SpriteChecksumBuilder();
+        SpritePackageInputStream spriteDataSection = new SpritePackageInputStream(generalInputStream, spriteChecksumBuilder);
         int[] spriteDimensions = ByteUtils.getUnsigned16Bit(spriteDimensionBytes);
         String text = new String(spriteDataSection.readNBytes(0x18));
         int finalOffset = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes(4))[0];
-        spriteDataSection.readToOffset(0x100048);
+        spriteDataSection.readToOffset(NUMBER_OF_SPRITES_LOCATION);
         int numberOfSprites = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes(4))[0];
-        int[] spriteOffsets = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes(numberOfSprites*4));
-        int oneMore = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes(4))[0];
-        log.info("Bytes between final offset and sprites: {} - {}", oneMore, Integer.toHexString(oneMore));
+        int[] pointers = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes((numberOfSprites+1)*4));
+        int endSignalLocation = pointers[pointers.length-1];
+        if(finalOffset != endSignalLocation) {
+            log.warn("End signal pointer {} at 0x100018 doesn't match the pointer at the end of the pointer table {}.", finalOffset, endSignalLocation);
+        }
         List<SpriteData.Sprite> sprites = new ArrayList<>(numberOfSprites);
-        int currentOffset = spriteOffsets[0];
+        int currentOffset = pointers[0];
         for(int i = 0; i < numberOfSprites; i++)
         {
+            spriteDataSection.readToOffset(currentOffset);
+            if(pointers[i+1] - currentOffset <= 0) {
+                throw new IllegalStateException("Unable to handle case where sprites are not in order. If this is an official DIM please raise an issue at https://github.com/cfogrady/VB-DIM-Reader/issues");
+            }
             int width = spriteDimensions[i*2];
             int height = spriteDimensions[i*2 + 1];
             int expectedSize = width * height * 2;
@@ -31,14 +41,12 @@ class DimSpritesReader {
                     .height(height)
                     .pixelData(spriteDataSection.readNBytes(expectedSize))
                     .build();
-            if(i != numberOfSprites-1) {
-                if(sprite.getPixelData().length != spriteOffsets[i+1] - currentOffset) {
-                    throw new IllegalStateException("Expected sprite size " + sprite.getPixelData().length + " doesn't match delta from current offset " + currentOffset + " to next offset " + spriteOffsets[i+1]);
-                }
-                currentOffset = spriteOffsets[i+1];
+            if(sprite.getPixelData().length > pointers[i+1] - currentOffset) {
+                throw new IllegalStateException("Expected sprite size " + sprite.getPixelData().length + " is too big to fit between current pointer " + currentOffset + " and next sprite's pointer " + pointers[i+1]);
             }
+            currentOffset = pointers[i+1];
             sprites.add(sprite);
         }
-        return SpriteData.builder().sprites(sprites).text(text).build();
+        return SpriteData.builder().sprites(sprites).text(text).spriteChecksums(spriteDataSection.getSpriteChecksums()).build();
     }
 }

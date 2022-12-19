@@ -13,3 +13,5 @@ build
 .project
 
 bin/
+
+test.bin
