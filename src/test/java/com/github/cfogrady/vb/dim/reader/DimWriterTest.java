@@ -1,8 +1,8 @@
 package com.github.cfogrady.vb.dim.reader;
 
-import com.github.cfogrady.vb.dim.reader.content.DimContent;
-import com.github.cfogrady.vb.dim.reader.reader.DimReader;
-import com.github.cfogrady.vb.dim.reader.writer.DimWriter;
+import com.github.cfogrady.vb.dim.card.DimCard;
+import com.github.cfogrady.vb.dim.card.DimReader;
+import com.github.cfogrady.vb.dim.card.DimWriter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,7 @@ public class DimWriterTest {
         fileInputStream.close();
         ByteArrayInputStream dimInputStream = new ByteArrayInputStream(image);
         DimReader dimReader = new DimReader();
-        DimContent content = dimReader.readDimData(dimInputStream, true);
+        DimCard content = dimReader.readDimData(dimInputStream, true);
 
         DimWriter writer = new DimWriter();
         ByteArrayOutputStream dimOutputStream = new ByteArrayOutputStream();
@@ -35,7 +35,7 @@ public class DimWriterTest {
         fileInputStream.close();
         ByteArrayInputStream dimInputStream = new ByteArrayInputStream(image);
         DimReader dimReader = new DimReader();
-        DimContent content = dimReader.readDimData(dimInputStream, true);
+        DimCard content = dimReader.readDimData(dimInputStream, true);
 
         DimWriter writer = new DimWriter();
         ByteArrayOutputStream dimOutputStream = new ByteArrayOutputStream();
