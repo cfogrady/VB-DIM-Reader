@@ -1,6 +1,5 @@
-package com.github.cfogrady.vb.dim.reader;
+package com.github.cfogrady.vb.dim.util;
 
-import com.github.cfogrady.vb.dim.util.ByteUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

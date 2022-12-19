@@ -1,7 +1,5 @@
-package com.github.cfogrady.vb.dim.reader;
+package com.github.cfogrady.vb.dim.card;
 
-import com.github.cfogrady.vb.dim.card.DimCard;
-import com.github.cfogrady.vb.dim.card.DimReader;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

@@ -1,7 +1,4 @@
-package com.github.cfogrady.vb.dim.writer;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+package com.github.cfogrady.vb.dim.sprite;
 
 public class SpriteChecksumHackerTest {
 // TODO: Break DimSpriteReader and probably the writer down into smaller components before writing these tests.
