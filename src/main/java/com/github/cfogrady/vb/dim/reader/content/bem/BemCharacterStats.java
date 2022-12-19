@@ -1,6 +1,5 @@
 package com.github.cfogrady.vb.dim.reader.content.bem;
 
-import com.github.cfogrady.vb.dim.reader.content.DimStats;
 import lombok.Builder;
 import lombok.Data;
 
@@ -8,13 +7,13 @@ import java.util.List;
 
 @Data
 @Builder(toBuilder = true)
-public class BemStats {
+public class BemCharacterStats {
     public static final int VB_TABLE_SIZE = 23;
 
     @Data
     @Builder(toBuilder = true)
-    public static class BemStatBlock {
-        private final int unknown;
+    public static class BemCharacterStatEntry {
+        private final int spriteResizeFlag; //seems to always be 2 for BE memories.
         private final int stage;
         private final int attribute;
         private final int type;
@@ -23,10 +22,10 @@ public class BemStats {
         private final int bp;
         private final int hp;
         private final int ap;
-        private final int firstPoolBattleChance;
-        private final int secondPoolBattleChance;
-        private final int thirdPoolBattleChance;
+        private final int firstPoolBattleChance; //stage 2-3
+        private final int secondPoolBattleChance; //stage 4-5
+        private final int thirdPoolBattleChance; //stage 6+
     }
 
-    private final List<BemStats.BemStatBlock> statBlocks;
+    private final List<BemCharacterStatEntry> characterEntries;
 }

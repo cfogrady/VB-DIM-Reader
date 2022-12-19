@@ -8,11 +8,10 @@ import lombok.Data;
 @Builder(toBuilder=true)
 public class BemContent implements CardContent {
     private final DimHeader dimHeader;
-    private final BemStats bemStats;
-    private final DimEvolutionRequirements dimEvolutionRequirements;
-    private final DimAdventures dimAdventures;
-    private final DimFusions dimFusions;
-    private final DimSpecificFusions dimSpecificFusion;
+    private final BemCharacterStats bemCharacterStats;
+    private final BemTransformationRequirements bemTransformationRequirements;
+    private final BemAdventureLevels bemAdventureLevels;
+    private final BemSpecificFusions bemSpecificFusions;
     private final int checksum;
     private final int calculatedCheckSum;
     private final SpriteData spriteData;
