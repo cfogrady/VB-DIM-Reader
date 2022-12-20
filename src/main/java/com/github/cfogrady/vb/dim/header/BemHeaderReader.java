@@ -3,7 +3,7 @@ package com.github.cfogrady.vb.dim.header;
 import java.util.Arrays;
 
 public class BemHeaderReader {
-    BemHeader readBemHeaderFromHeaderBytes(byte[] headerBytes) {
+    public BemHeader readBemHeaderFromHeaderBytes(byte[] headerBytes) {
         BemHeader.BemHeaderBuilder builder = BemHeader.builder();
         DimHeaderReader.dimHeaderForBytes(headerBytes, builder);
         builder.bemFlags(Arrays.copyOfRange(headerBytes, 0x1000, 0x1010));
