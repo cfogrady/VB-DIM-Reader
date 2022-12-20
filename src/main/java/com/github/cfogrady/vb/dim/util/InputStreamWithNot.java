@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 @RequiredArgsConstructor
-public class InputStreamWithNot {
+public class InputStreamWithNot implements ByteOffsetInputStream {
     private final InputStream inputStream;
     private final DIMChecksumBuilder checksumBuilder;
     private int location = 0;

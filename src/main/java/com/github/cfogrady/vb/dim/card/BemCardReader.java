@@ -21,7 +21,7 @@ public class BemCardReader {
         BemHeader header = bemHeaderReader.readBemHeaderFromHeaderBytes(headerBytes);
         try {
             inputStream.readToOffset(BemCardConstants.CHARACTER_SECTION_START);
-            
+
             return BemCard.builder()
                     .bemHeader(header)
                     .build();

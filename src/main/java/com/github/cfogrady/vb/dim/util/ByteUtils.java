@@ -65,4 +65,24 @@ public class ByteUtils {
         }
         return true;
     }
+
+    public static boolean onlyZerosOrMaxValuesInArray(int[] values) {
+        //Some cards mark rows of the table as invalid by using max 16-bit int instead of zeros...
+        for(int i = 0; i < values.length; i++) {
+            if(values[i] != 0 && values[i] != 65535) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean onlyZerosInArray(int[] values) {
+        //Some cards mark rows of the table as invalid by using max 16-bit int instead of zeros...
+        for(int i = 0; i < values.length; i++) {
+            if(values[i] != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
