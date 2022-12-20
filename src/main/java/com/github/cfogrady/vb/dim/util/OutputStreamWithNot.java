@@ -10,6 +10,7 @@ public class OutputStreamWithNot implements ByteOffsetOutputStream {
     private final OutputStream outputStream;
     private final DIMChecksumBuilder checksumBuilder;
     private int location = 0;
+
     public static OutputStreamWithNot wrap(OutputStream outputStream, DIMChecksumBuilder checksumBuilder) {
         return new OutputStreamWithNot(outputStream, checksumBuilder);
     }

@@ -1,9 +1,9 @@
 package com.github.cfogrady.vb.dim.header;
 
-import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.SuperBuilder;
 
-@Builder(toBuilder=true)
+@SuperBuilder(toBuilder = true)
 @Data
 public class DimHeader {
 	private final String text;
