@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 
 public class BemCharacterWriter {
-    public void writeBemCharacter(BemCharacterStats characterStats, ByteOffsetOutputStream generalOutputStream) {
+    public void writeBemCharacters(BemCharacterStats characterStats, ByteOffsetOutputStream generalOutputStream) {
         try {
             int index = 0;
             for(BemCharacterStats.BemCharacterStatEntry entry : characterStats.getCharacterEntries()) {

@@ -71,7 +71,7 @@ public class BemCharacterReaderTest {
 
     private byte[] getTableInBytes(BemCharacterStats bemCharacterStats) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bemCharacterWriter.writeBemCharacter(bemCharacterStats, new RelativeByteOffsetOutputStream(outputStream));
+        bemCharacterWriter.writeBemCharacters(bemCharacterStats, new RelativeByteOffsetOutputStream(outputStream));
         return outputStream.toByteArray();
     }
 }
