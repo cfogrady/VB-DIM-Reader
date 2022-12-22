@@ -2,6 +2,7 @@ package com.github.cfogrady.vb.dim.card;
 
 import com.github.cfogrady.vb.dim.adventure.BemAdventureLevels;
 import com.github.cfogrady.vb.dim.character.BemCharacterStats;
+import com.github.cfogrady.vb.dim.fusion.BemAttributeFusions;
 import com.github.cfogrady.vb.dim.fusion.BemSpecificFusions;
 import com.github.cfogrady.vb.dim.header.BemHeader;
 import com.github.cfogrady.vb.dim.header.DimHeader;
@@ -17,6 +18,7 @@ public class BemCard implements Card {
     private final BemCharacterStats bemCharacterStats;
     private final BemTransformationRequirements bemTransformationRequirements;
     private final BemAdventureLevels bemAdventureLevels;
+    private final BemAttributeFusions bemAttributeFusions;
     private final BemSpecificFusions bemSpecificFusions;
     private final int checksum;
     private final int calculatedCheckSum;

@@ -36,6 +36,16 @@ public class OutputStreamWithNot implements ByteOffsetOutputStream {
         }
     }
 
+    public void write16BitValueUntilOffset(int value, int offset) throws IOException {
+        if(offset > location) {
+            int words = (offset - location)/2;
+            byte[] word = ByteUtils.convert16BitIntToBytes(value);
+            for(int i = 0; i < words; i++) {
+                this.writeBytes(word);
+            }
+        }
+    }
+
     public int getChecksum() {
         return checksumBuilder.getCheckSum();
     }
