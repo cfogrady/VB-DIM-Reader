@@ -1,5 +1,6 @@
 package com.github.cfogrady.vb.dim.sprite;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Builder;
@@ -14,6 +15,17 @@ public class SpriteData {
 	private final List<Sprite> sprites;
 	private final String text;
 	private final List<Integer> spriteChecksums;
+
+	public List<SpriteDimensions> getSpriteDimensions() {
+		List<SpriteDimensions> dimensions = new ArrayList<>(sprites.size());
+		for(Sprite sprite : sprites) {
+			dimensions.add(SpriteDimensions.builder()
+					.width(sprite.getWidth())
+					.height(sprite.getHeight())
+					.build());
+		}
+		return dimensions;
+	}
 
 	@Builder(toBuilder=true)
 	@Data
@@ -75,6 +87,13 @@ public class SpriteData {
 		int maxValueOld = (int) Math.pow(2, fromBits) -1;
 		int fullColor = (color * 255) / maxValueOld;
 		return fullColor;
+	}
+
+	@Builder(toBuilder=true)
+	@Data
+	public static class SpriteDimensions {
+		private final int width;
+		private final int height;
 	}
 
 }

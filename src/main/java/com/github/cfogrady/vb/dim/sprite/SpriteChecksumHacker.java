@@ -30,7 +30,7 @@ public class SpriteChecksumHacker {
     private byte[] areaToChecksum;
     private SpriteData spriteData;
 
-    public void writeInterweavedSpriteTableAndSpritesWithChecksumFixes(SpriteData spriteData, OutputStreamWithNot mainOutputStream) throws IOException {
+    public void writeInterweavedSpriteTableAndSpritesWithChecksumFixes(SpriteData spriteData, ByteOffsetOutputStream mainOutputStream) throws IOException {
         log.info("Attempting to weave sprites and add false data to fix checksums");
         RelativeByteOffsetOutputStream spritePackageOutputStream = new RelativeByteOffsetOutputStream(mainOutputStream);
         setupFromSpriteData(spriteData);

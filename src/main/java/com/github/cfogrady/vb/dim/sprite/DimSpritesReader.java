@@ -1,5 +1,6 @@
 package com.github.cfogrady.vb.dim.sprite;
 
+import com.github.cfogrady.vb.dim.util.ByteOffsetInputStream;
 import com.github.cfogrady.vb.dim.util.ByteUtils;
 import com.github.cfogrady.vb.dim.util.InputStreamWithNot;
 import lombok.extern.slf4j.Slf4j;
@@ -13,9 +14,13 @@ import static com.github.cfogrady.vb.dim.sprite.SpriteWriter.NUMBER_OF_SPRITES_L
 @Slf4j
 public class DimSpritesReader {
     public static SpriteData spriteDataFromBytesAndStream(byte[] spriteDimensionBytes, InputStreamWithNot generalInputStream) throws IOException {
+        List<SpriteData.SpriteDimensions> spriteDimensions = getSpriteDimensionsFromBytes(spriteDimensionBytes);
+        return spriteDataFromDimensionsAndStream(spriteDimensions, generalInputStream);
+    }
+
+    public static SpriteData spriteDataFromDimensionsAndStream(List<SpriteData.SpriteDimensions> spriteDimensions, ByteOffsetInputStream generalInputStream) throws IOException {
         SpriteChecksumBuilder spriteChecksumBuilder = new SpriteChecksumBuilder();
         SpritePackageInputStream spriteDataSection = new SpritePackageInputStream(generalInputStream, spriteChecksumBuilder);
-        int[] spriteDimensions = ByteUtils.getUnsigned16Bit(spriteDimensionBytes);
         String text = new String(spriteDataSection.readNBytes(0x18));
         int finalOffset = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes(4))[0];
         spriteDataSection.readToOffset(NUMBER_OF_SPRITES_LOCATION);
@@ -33,8 +38,9 @@ public class DimSpritesReader {
             if(pointers[i+1] - currentOffset <= 0) {
                 throw new IllegalStateException("Unable to handle case where sprites are not in order. If this is an official DIM please raise an issue at https://github.com/cfogrady/VB-DIM-Reader/issues");
             }
-            int width = spriteDimensions[i*2];
-            int height = spriteDimensions[i*2 + 1];
+            SpriteData.SpriteDimensions dimensions = spriteDimensions.get(i);
+            int width = dimensions.getWidth();
+            int height = dimensions.getHeight();
             int expectedSize = width * height * 2;
             SpriteData.Sprite sprite = SpriteData.Sprite.builder()
                     .width(width)
@@ -48,5 +54,17 @@ public class DimSpritesReader {
             sprites.add(sprite);
         }
         return SpriteData.builder().sprites(sprites).text(text).spriteChecksums(spriteDataSection.getSpriteChecksums()).build();
+    }
+
+    private static List<SpriteData.SpriteDimensions> getSpriteDimensionsFromBytes(byte[] dimensionBytes) {
+        int[] spriteDimensionValues = ByteUtils.getUnsigned16Bit(dimensionBytes);
+        List<SpriteData.SpriteDimensions> spriteDimensions = new ArrayList<>(spriteDimensionValues.length/2);
+        for(int i = 0; i < spriteDimensionValues.length; i+=2) {
+            spriteDimensions.add(SpriteData.SpriteDimensions.builder()
+                            .width(spriteDimensionValues[i])
+                            .height(spriteDimensionValues[i+1])
+                    .build());
+        }
+        return spriteDimensions;
     }
 }

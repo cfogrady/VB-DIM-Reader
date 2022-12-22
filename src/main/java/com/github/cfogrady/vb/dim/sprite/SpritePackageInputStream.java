@@ -1,5 +1,6 @@
 package com.github.cfogrady.vb.dim.sprite;
 
+import com.github.cfogrady.vb.dim.util.ByteOffsetInputStream;
 import com.github.cfogrady.vb.dim.util.InputStreamWithNot;
 import lombok.RequiredArgsConstructor;
 
@@ -8,7 +9,7 @@ import java.util.ArrayList;
 
 @RequiredArgsConstructor
 public class SpritePackageInputStream {
-    private final InputStreamWithNot generalInputStream;
+    private final ByteOffsetInputStream generalInputStream;
     private final SpriteChecksumBuilder spriteChecksumBuilder;
     private int location = 0;
 

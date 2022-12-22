@@ -20,7 +20,7 @@ public class SpriteWriter {
     public static final int TERMINATION_BYTES_OF_POINTER_TABLE = 0x18;
     public static final int TERMINATION_BYTES = 0xFFFFFF02;
     public static SpriteChecksumHacker checksumHacker = new SpriteChecksumHacker(PIXEL_POINTER_TABLE_START, SpriteChecksumBuilder.CHUNK_CHECKSUM_PORTION);
-    public static void writeSpriteData(SpriteData spriteData, boolean hasSpriteSigning, OutputStreamWithNot outputStreamWithNot) throws IOException {
+    public static void writeSpriteData(SpriteData spriteData, boolean hasSpriteSigning, ByteOffsetOutputStream outputStreamWithNot) throws IOException {
         outputStreamWithNot.writeZerosUntilOffset(SPRITE_SECTION_START);
         if(hasSpriteSigning) {
             writeSpriteDataToMatchChecksum(outputStreamWithNot, spriteData);
@@ -30,7 +30,7 @@ public class SpriteWriter {
 
     }
 
-    private static void writeSpriteDataToMatchChecksum(OutputStreamWithNot outputStreamWithNot, SpriteData spriteData) throws IOException {
+    private static void writeSpriteDataToMatchChecksum(ByteOffsetOutputStream outputStreamWithNot, SpriteData spriteData) throws IOException {
         checksumHacker.writeInterweavedSpriteTableAndSpritesWithChecksumFixes(spriteData, outputStreamWithNot);
     }
 
