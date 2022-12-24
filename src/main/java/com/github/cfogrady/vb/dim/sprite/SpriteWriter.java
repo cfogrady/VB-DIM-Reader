@@ -19,7 +19,8 @@ public class SpriteWriter {
     public static final int NUMBER_OF_SPRITES_LOCATION = 0x48;
     public static final int TERMINATION_BYTES_OF_POINTER_TABLE = 0x18;
     public static final int TERMINATION_BYTES = 0xFFFFFF02;
-    public static SpriteChecksumHacker checksumHacker = new SpriteChecksumHacker(PIXEL_POINTER_TABLE_START, SpriteChecksumBuilder.CHUNK_CHECKSUM_PORTION);
+    public static final SpriteChecksumAreasCalculator SPRITE_CHECKSUM_AREAS_CALCULATOR = SpriteChecksumAreasCalculator.buildForDIM();
+    public static SpriteChecksumHacker checksumHacker = new SpriteChecksumHacker(SPRITE_CHECKSUM_AREAS_CALCULATOR, PIXEL_POINTER_TABLE_START);
     public static void writeSpriteData(SpriteData spriteData, boolean hasSpriteSigning, ByteOffsetOutputStream outputStreamWithNot) throws IOException {
         outputStreamWithNot.writeZerosUntilOffset(SPRITE_SECTION_START);
         if(hasSpriteSigning) {
