@@ -105,7 +105,7 @@ public class SpriteChecksumHacker {
                     writeSpriteToInMemoryOutput(index, sprite);
                 }
             } else if(checksumStartsInSprite(sprite)) {
-                int checksumStartLocation = spriteChecksumAreasCalculator.nextChecksumPortion(potentialSpriteStartLocation);
+                int checksumStartLocation = spriteChecksumAreasCalculator.nextChecksumStart(potentialSpriteStartLocation);
                 int checksumEndLocation = spriteChecksumAreasCalculator.nextChecksumEnd(checksumStartLocation);
                 if(checksumEndLocation <= potentialSpriteStartLocation + sprite.getByteCountAt16BitPerPixel()) {
                     //fully encompassed within this sprite
@@ -184,7 +184,7 @@ public class SpriteChecksumHacker {
     }
 
     private int getExpectedChecksumForNextBlock() {
-        int nextChecksumStart = spriteChecksumAreasCalculator.nextChecksumPortion(potentialSpriteStartLocation);
+        int nextChecksumStart = spriteChecksumAreasCalculator.nextChecksumStart(potentialSpriteStartLocation);
         int checksumPortionIndex = spriteChecksumAreasCalculator.calculateWhichChunk(nextChecksumStart);
         return spriteData.getSpriteChecksums().get(checksumPortionIndex);
     }
@@ -235,7 +235,7 @@ public class SpriteChecksumHacker {
 
     private boolean checksumStartsInSprite(SpriteData.Sprite sprite) {
         int spriteEndLocation = potentialSpriteStartLocation + sprite.getByteCountAt16BitPerPixel();
-        return spriteChecksumAreasCalculator.nextChecksumPortion(potentialSpriteStartLocation) < spriteEndLocation;
+        return spriteChecksumAreasCalculator.nextChecksumStart(potentialSpriteStartLocation) < spriteEndLocation;
 
     }
 

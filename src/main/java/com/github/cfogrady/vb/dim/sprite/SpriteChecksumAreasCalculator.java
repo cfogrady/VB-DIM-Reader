@@ -29,7 +29,7 @@ public class SpriteChecksumAreasCalculator {
     }
 
     private boolean isAfterChecksumStart(int relativeLocation) {
-        return relativeLocation > relativeChecksumStartLocation;
+        return relativeLocation >= relativeChecksumStartLocation;
     }
 
     public int calculateWhichChunk(int relativeLocation) {
@@ -37,18 +37,36 @@ public class SpriteChecksumAreasCalculator {
         return relativeLoc / chunkInterval;
     }
 
-    public int nextChecksumPortion(int relativeLocation) {
-        int relativeLoc = relativeLocation - relativeChecksumStartLocation;
-        int currentLocationChunk = relativeLoc / chunkInterval;
-        if(currentLocationChunk >= numberOfChunks -1) {
-            //there is no max portion if we are already in or past the number of chunks
+    public int nextChecksumStart(int relativeLocation) {
+        if(beforeStart(relativeLocation)) {
+            // before the start of the first
+            return relativeChecksumStartLocation;
+        } else if(afterEnd(relativeLocation)) {
+            // We're past the end of the checksum, there is no next checksumPortion
             return Integer.MAX_VALUE;
         }
-        int startsAt = ((currentLocationChunk + 1) * chunkInterval) + relativeChecksumStartLocation;
+        int relativeLoc = relativeLocation - relativeChecksumStartLocation;
+        int chunkOfNextStart = (relativeLoc / chunkInterval)+1;
+        int startsAt = (chunkOfNextStart * chunkInterval) + relativeChecksumStartLocation;
         return startsAt;
     }
 
+    boolean beforeStart(int relativeLocation) {
+        return relativeLocation < relativeChecksumStartLocation;
+    }
+
+    boolean afterEnd(int relativeLocation) {
+        return relativeLocation > (numberOfChunks-1) * chunkInterval + relativeChecksumStartLocation + checksumChunkSize;
+    }
+
     public int nextChecksumEnd(int relativeLocation) {
+        if(beforeStart(relativeLocation)) {
+            // before the start of the first
+            return relativeChecksumStartLocation + checksumChunkSize;
+        } else if(afterEnd(relativeLocation)) {
+            // We're past the end of the checksum, there is no next checksumPortion
+            return Integer.MAX_VALUE;
+        }
         int locationRelativeToChecksumStart = relativeLocation - relativeChecksumStartLocation;
         int locInChunk = locationRelativeToChecksumStart % chunkInterval;
         int currentLocationChunk = locationRelativeToChecksumStart / chunkInterval;
