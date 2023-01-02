@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -110,7 +108,7 @@ public class SpriteChecksumHacker {
                     writeSpriteToInMemoryOutput(index, sprite);
                 }
             } else if(checksumStartsInSprite(sprite)) {
-                int checksumStartLocation = SpriteChecksumBuilder.nextChecksumPortion(potentialSpriteStartLocation);
+                int checksumStartLocation = SpriteChecksumBuilder.nextChecksumStart(potentialSpriteStartLocation);
                 int checksumEndLocation = SpriteChecksumBuilder.nextChecksumEnd(checksumStartLocation);
                 if(checksumEndLocation <= potentialSpriteStartLocation + sprite.getByteCountAt16BitPerPixel()) {
                     //fully encompassed within this sprite
@@ -189,7 +187,7 @@ public class SpriteChecksumHacker {
     }
 
     private int getExpectedChecksumForNextBlock() {
-        int nextChecksumStart = SpriteChecksumBuilder.nextChecksumPortion(potentialSpriteStartLocation);
+        int nextChecksumStart = SpriteChecksumBuilder.nextChecksumStart(potentialSpriteStartLocation);
         int checksumPortionIndex = SpriteChecksumBuilder.calculateWhichChunk(nextChecksumStart);
         return spriteData.getSpriteChecksums().get(checksumPortionIndex);
     }
@@ -240,7 +238,7 @@ public class SpriteChecksumHacker {
 
     private boolean checksumStartsInSprite(SpriteData.Sprite sprite) {
         int spriteEndLocation = potentialSpriteStartLocation + sprite.getByteCountAt16BitPerPixel();
-        return SpriteChecksumBuilder.nextChecksumPortion(potentialSpriteStartLocation) < spriteEndLocation;
+        return SpriteChecksumBuilder.nextChecksumStart(potentialSpriteStartLocation) < spriteEndLocation;
 
     }
 
