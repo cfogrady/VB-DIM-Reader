@@ -34,7 +34,7 @@ public class SpriteChecksumBuilder {
     }
 
     private static boolean isAfterChecksumStart(int relativeLocation) {
-        return relativeLocation > RELATIVE_CHECKSUM_START_LOCATION;
+        return relativeLocation >= RELATIVE_CHECKSUM_START_LOCATION;
     }
 
     public static int calculateWhichChunk(int relativeLocation) {
