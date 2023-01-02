@@ -67,7 +67,7 @@ public class SpriteChecksumBuilder {
     public static int nextChecksumEnd(int relativeLocation) {
         if(beforeStart(relativeLocation)) {
             // before the start of the first
-            return RELATIVE_CHECKSUM_START_LOCATION;
+            return RELATIVE_CHECKSUM_START_LOCATION + CHUNK_CHECKSUM_PORTION;
         } else if(afterEnd(relativeLocation)) {
             // We're past the end of the checksum, there is no next checksumPortion
             return Integer.MAX_VALUE;
