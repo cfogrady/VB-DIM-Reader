@@ -15,14 +15,14 @@ public class BemSpriteReader {
             RelativeByteOffsetInputStream relativeInputStream = new RelativeByteOffsetInputStream(generalInputStream);
             List<SpriteData.SpriteDimensions> dimensions = new ArrayList<>();
             int[] values = getDimensionRowValues(relativeInputStream);
-            boolean validRow = !ByteUtils.onlyZerosOrMaxValuesInArray(values);
+            boolean validRow = !anyZeros(values);
             while (validRow) {
                 dimensions.add(SpriteData.SpriteDimensions.builder()
                         .width(values[0])
                         .height(values[1])
                         .build());
                 values = getDimensionRowValues(relativeInputStream);
-                validRow = !ByteUtils.onlyZerosOrMaxValuesInArray(values);
+                validRow = !anyZeros(values);
             }
             return dimensions;
         } catch (IOException ioe) {
@@ -41,5 +41,14 @@ public class BemSpriteReader {
     private int[] getDimensionRowValues(RelativeByteOffsetInputStream relativeInputStream) throws IOException {
         byte[] rowBytes = relativeInputStream.readNBytes(2 * 2);
         return ByteUtils.getUnsigned16Bit(rowBytes);
+    }
+
+    private boolean anyZeros(int[] values) {
+        for(int value : values) {
+            if(value == 0) {
+                return true;
+            }
+        }
+        return false;
     }
 }
