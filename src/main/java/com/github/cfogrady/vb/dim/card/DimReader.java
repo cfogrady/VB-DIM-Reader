@@ -12,12 +12,14 @@ import com.github.cfogrady.vb.dim.fusion.DimSpecificFusionsReader;
 import com.github.cfogrady.vb.dim.header.DimHeader;
 import com.github.cfogrady.vb.dim.header.DimHeaderReader;
 import com.github.cfogrady.vb.dim.sprite.DimSpritesReader;
+import com.github.cfogrady.vb.dim.sprite.SpriteChecksumAreasCalculator;
 import com.github.cfogrady.vb.dim.transformation.DimEvolutionsReader;
 import com.github.cfogrady.vb.dim.util.ByteUtils;
 import com.github.cfogrady.vb.dim.util.DIMChecksumBuilder;
 import com.github.cfogrady.vb.dim.sprite.SpriteData;
 import com.github.cfogrady.vb.dim.transformation.DimEvolutionRequirements;
 import com.github.cfogrady.vb.dim.util.InputStreamWithNot;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -25,18 +27,18 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 
 @Slf4j
+@RequiredArgsConstructor
 public class DimReader {
 
     public static final int NONE_VALUE = 65535;
 
     private final BemCardReader bemCardReader;
+    private final DimSpritesReader dimSpritesReader;
 
     public DimReader() {
-        this.bemCardReader = new BemCardReader();
-    }
 
-    public DimReader(BemCardReader bemCardReader) {
-        this.bemCardReader = bemCardReader;
+        this.bemCardReader = new BemCardReader();
+        this.dimSpritesReader = new DimSpritesReader(SpriteChecksumAreasCalculator.buildForDIM());
     }
 
     public Card readDimCardData(InputStream inputStream, boolean verifyChecksum) {
@@ -88,7 +90,7 @@ public class DimReader {
         DimFusions fusions = DimFusionsReader.dimFusionsFromBytes(bytes);
         bytes = inputStreamWithNot.readToOffset(0x100000);
         DimSpecificFusions dimSpecificFusions = DimSpecificFusionsReader.dimSpecificFusionsFromBytes(bytes);
-        SpriteData spriteData = DimSpritesReader.spriteDataFromBytesAndStream(spriteDimensions, inputStreamWithNot);
+        SpriteData spriteData = dimSpritesReader.spriteDataFromBytesAndStream(spriteDimensions, inputStreamWithNot);
         inputStreamWithNot.readToOffset(0x3FFFFE);
         bytes = inputStreamWithNot.readNBytes(2);
         int dimChecksum = ByteUtils.getUnsigned16Bit(bytes)[0];

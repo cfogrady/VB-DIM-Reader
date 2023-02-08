@@ -21,7 +21,7 @@ public class SpriteChecksumAreasCalculator {
     }
 
     public static SpriteChecksumAreasCalculator buildForBEM() {
-        int NUMBER_OF_CHUNKS = 28;
+        int NUMBER_OF_CHUNKS = 0x30; //full 3MB of the card
         int CHUNK_SIZE = 0x10000;
         int RELATIVE_CHECKSUM_START_LOCATION = 0x2000;
         int CHUNK_CHECKSUM_PORTION = 0x1000;

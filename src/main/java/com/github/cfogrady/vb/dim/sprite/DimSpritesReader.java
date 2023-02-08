@@ -3,6 +3,7 @@ package com.github.cfogrady.vb.dim.sprite;
 import com.github.cfogrady.vb.dim.util.ByteOffsetInputStream;
 import com.github.cfogrady.vb.dim.util.ByteUtils;
 import com.github.cfogrady.vb.dim.util.InputStreamWithNot;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -12,14 +13,16 @@ import java.util.List;
 import static com.github.cfogrady.vb.dim.sprite.SpriteWriter.NUMBER_OF_SPRITES_LOCATION;
 
 @Slf4j
+@RequiredArgsConstructor
 public class DimSpritesReader {
-    public static SpriteData spriteDataFromBytesAndStream(byte[] spriteDimensionBytes, InputStreamWithNot generalInputStream) throws IOException {
+    private final SpriteChecksumAreasCalculator spriteChecksumAreasCalculator;
+    public SpriteData spriteDataFromBytesAndStream(byte[] spriteDimensionBytes, InputStreamWithNot generalInputStream) throws IOException {
         List<SpriteData.SpriteDimensions> spriteDimensions = getSpriteDimensionsFromBytes(spriteDimensionBytes);
         return spriteDataFromDimensionsAndStream(spriteDimensions, generalInputStream);
     }
 
-    public static SpriteData spriteDataFromDimensionsAndStream(List<SpriteData.SpriteDimensions> spriteDimensions, ByteOffsetInputStream generalInputStream) throws IOException {
-        SpriteChecksumBuilder spriteChecksumBuilder = new SpriteChecksumBuilder();
+    public SpriteData spriteDataFromDimensionsAndStream(List<SpriteData.SpriteDimensions> spriteDimensions, ByteOffsetInputStream generalInputStream) throws IOException {
+        SpriteChecksumBuilder spriteChecksumBuilder = new SpriteChecksumBuilder(spriteChecksumAreasCalculator);
         SpritePackageInputStream spriteDataSection = new SpritePackageInputStream(generalInputStream, spriteChecksumBuilder);
         String text = new String(spriteDataSection.readNBytes(0x18));
         int finalOffset = ByteUtils.getIntsFromBytes(spriteDataSection.readNBytes(4))[0];
@@ -56,7 +59,7 @@ public class DimSpritesReader {
         return SpriteData.builder().sprites(sprites).text(text).spriteChecksums(spriteDataSection.getSpriteChecksums()).build();
     }
 
-    private static List<SpriteData.SpriteDimensions> getSpriteDimensionsFromBytes(byte[] dimensionBytes) {
+    private List<SpriteData.SpriteDimensions> getSpriteDimensionsFromBytes(byte[] dimensionBytes) {
         int[] spriteDimensionValues = ByteUtils.getUnsigned16Bit(dimensionBytes);
         List<SpriteData.SpriteDimensions> spriteDimensions = new ArrayList<>(spriteDimensionValues.length/2);
         for(int i = 0; i < spriteDimensionValues.length; i+=2) {
