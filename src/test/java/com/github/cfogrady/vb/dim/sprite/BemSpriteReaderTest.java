@@ -1,7 +1,5 @@
 package com.github.cfogrady.vb.dim.sprite;
 
-import com.github.cfogrady.vb.dim.character.BemCharacterConstants;
-import com.github.cfogrady.vb.dim.character.BemCharacterStats;
 import com.github.cfogrady.vb.dim.util.RelativeByteOffsetInputStream;
 import com.github.cfogrady.vb.dim.util.RelativeByteOffsetOutputStream;
 import org.junit.jupiter.api.Assertions;
@@ -22,7 +20,10 @@ public class BemSpriteReaderTest {
     @BeforeEach
     void setup() {
         this.bemSpriteReader = new BemSpriteReader();
-        this.bemSpriteWriter = new BemSpriteWriter();
+        SpriteChecksumAreasCalculator spriteChecksumAreasCalculator = SpriteChecksumAreasCalculator.buildForBEM();
+        SpriteChecksumHacker checksumHacker = new SpriteChecksumHacker(spriteChecksumAreasCalculator, SpriteWriter.PIXEL_POINTER_TABLE_START);
+        SpriteWriter spriteWriter = new SpriteWriter(checksumHacker);
+        this.bemSpriteWriter = new BemSpriteWriter(spriteWriter);
     }
 
     @Test
@@ -30,7 +31,7 @@ public class BemSpriteReaderTest {
         int numberOfSprites = 371;
         List<SpriteData.SpriteDimensions> expectedSpriteDimensions = createSpriteDimensions(numberOfSprites);
         byte[] table = getTableInBytes(expectedSpriteDimensions);
-        Assertions.assertEquals(numberOfSprites*2*2, table.length);
+        Assertions.assertEquals(numberOfSprites*2*2 + 4, table.length);
         List<SpriteData.SpriteDimensions> readDimensions = bemSpriteReader.readSpriteDimensions(new RelativeByteOffsetInputStream(new ByteArrayInputStream(table)));
         Assertions.assertEquals(expectedSpriteDimensions.size(), readDimensions.size());
         for(int i = 0; i < readDimensions.size(); i++) {
@@ -45,8 +46,8 @@ public class BemSpriteReaderTest {
         List<SpriteData.SpriteDimensions> entries = new ArrayList<>(number);
         for(int i = 0; i < number; i++) {
             entries.add(SpriteData.SpriteDimensions.builder()
-                    .width(random.nextInt(80))
-                    .height(random.nextInt(160))
+                    .width(random.nextInt(81) + 1)
+                    .height(random.nextInt(161) + 1)
                     .build());
         }
         return entries;
@@ -55,6 +56,11 @@ public class BemSpriteReaderTest {
     private byte[] getTableInBytes(List<SpriteData.SpriteDimensions> spriteDimensions) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         bemSpriteWriter.writeSpriteDimensions(spriteDimensions, new RelativeByteOffsetOutputStream(outputStream));
+        //extra 4 bytes to represent 0s after the dimensions are finished being read
+        outputStream.write(0);
+        outputStream.write(0);
+        outputStream.write(0);
+        outputStream.write(0);
         return outputStream.toByteArray();
     }
 }

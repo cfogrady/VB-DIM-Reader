@@ -1,17 +1,15 @@
 package com.github.cfogrady.vb.dim.sprite;
 
-import com.github.cfogrady.vb.dim.sprite.SpriteChecksumHacker;
 import com.github.cfogrady.vb.dim.util.ByteOffsetOutputStream;
 import com.github.cfogrady.vb.dim.util.ByteUtils;
-import com.github.cfogrady.vb.dim.sprite.SpriteData;
-import com.github.cfogrady.vb.dim.sprite.SpriteChecksumBuilder;
-import com.github.cfogrady.vb.dim.util.OutputStreamWithNot;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.*;
 
 @Slf4j
+@RequiredArgsConstructor
 public class SpriteWriter {
     public static final int SPRITE_SECTION_START = 0x100_000;
     public static final int TABLE_START = 0x40;
@@ -19,9 +17,9 @@ public class SpriteWriter {
     public static final int NUMBER_OF_SPRITES_LOCATION = 0x48;
     public static final int TERMINATION_BYTES_OF_POINTER_TABLE = 0x18;
     public static final int TERMINATION_BYTES = 0xFFFFFF02;
-    public static final SpriteChecksumAreasCalculator SPRITE_CHECKSUM_AREAS_CALCULATOR = SpriteChecksumAreasCalculator.buildForDIM();
-    public static SpriteChecksumHacker checksumHacker = new SpriteChecksumHacker(SPRITE_CHECKSUM_AREAS_CALCULATOR, PIXEL_POINTER_TABLE_START);
-    public static void writeSpriteData(SpriteData spriteData, boolean hasSpriteSigning, ByteOffsetOutputStream outputStreamWithNot) throws IOException {
+
+    private final SpriteChecksumHacker checksumHacker;
+    public void writeSpriteData(SpriteData spriteData, boolean hasSpriteSigning, ByteOffsetOutputStream outputStreamWithNot) throws IOException {
         outputStreamWithNot.writeZerosUntilOffset(SPRITE_SECTION_START);
         if(hasSpriteSigning) {
             writeSpriteDataToMatchChecksum(outputStreamWithNot, spriteData);
@@ -31,7 +29,7 @@ public class SpriteWriter {
 
     }
 
-    private static void writeSpriteDataToMatchChecksum(ByteOffsetOutputStream outputStreamWithNot, SpriteData spriteData) throws IOException {
+    private void writeSpriteDataToMatchChecksum(ByteOffsetOutputStream outputStreamWithNot, SpriteData spriteData) throws IOException {
         checksumHacker.writeInterweavedSpriteTableAndSpritesWithChecksumFixes(spriteData, outputStreamWithNot);
     }
 

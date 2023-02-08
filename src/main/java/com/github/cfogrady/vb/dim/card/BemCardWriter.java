@@ -5,6 +5,9 @@ import com.github.cfogrady.vb.dim.character.BemCharacterWriter;
 import com.github.cfogrady.vb.dim.fusion.BemFusionWriter;
 import com.github.cfogrady.vb.dim.header.BemHeaderWriter;
 import com.github.cfogrady.vb.dim.sprite.BemSpriteWriter;
+import com.github.cfogrady.vb.dim.sprite.SpriteChecksumAreasCalculator;
+import com.github.cfogrady.vb.dim.sprite.SpriteChecksumHacker;
+import com.github.cfogrady.vb.dim.sprite.SpriteWriter;
 import com.github.cfogrady.vb.dim.transformation.BemTransformationWriter;
 import com.github.cfogrady.vb.dim.util.ByteUtils;
 import com.github.cfogrady.vb.dim.util.DIMChecksumBuilder;
@@ -27,11 +30,14 @@ public class BemCardWriter {
     private final BemFusionWriter bemFusionWriter;
 
     public BemCardWriter() {
+        SpriteChecksumAreasCalculator spriteChecksumAreasCalculator = SpriteChecksumAreasCalculator.buildForBEM();
+        SpriteChecksumHacker checksumHacker = new SpriteChecksumHacker(spriteChecksumAreasCalculator, SpriteWriter.PIXEL_POINTER_TABLE_START);
+        SpriteWriter spriteWriter = new SpriteWriter(checksumHacker);
         this.bemHeaderWriter = new BemHeaderWriter();
         this.bemCharacterWriter = new BemCharacterWriter();
         this.bemTransformationWriter = new BemTransformationWriter();
         this.bemAdventureWriter = new BemAdventureWriter();
-        this.bemSpriteWriter = new BemSpriteWriter();
+        this.bemSpriteWriter = new BemSpriteWriter(spriteWriter);
         this.bemFusionWriter = new BemFusionWriter();
     }
 

@@ -3,13 +3,22 @@ package com.github.cfogrady.vb.dim.sprite;
 import com.github.cfogrady.vb.dim.util.ByteOffsetInputStream;
 import com.github.cfogrady.vb.dim.util.ByteUtils;
 import com.github.cfogrady.vb.dim.util.RelativeByteOffsetInputStream;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@RequiredArgsConstructor
 public class BemSpriteReader {
+    private final DimSpritesReader dimSpritesReader;
+
+    public BemSpriteReader() {
+        dimSpritesReader = new DimSpritesReader(SpriteChecksumAreasCalculator.buildForBEM());
+    }
+
+
     public List<SpriteData.SpriteDimensions> readSpriteDimensions(ByteOffsetInputStream generalInputStream) {
         try {
             RelativeByteOffsetInputStream relativeInputStream = new RelativeByteOffsetInputStream(generalInputStream);
@@ -32,7 +41,7 @@ public class BemSpriteReader {
 
     public SpriteData getSpriteData(ByteOffsetInputStream generalInputStream, List<SpriteData.SpriteDimensions> spriteDimensions) {
         try {
-            return DimSpritesReader.spriteDataFromDimensionsAndStream(spriteDimensions, generalInputStream);
+            return dimSpritesReader.spriteDataFromDimensionsAndStream(spriteDimensions, generalInputStream);
         } catch (IOException ioe) {
             throw new UncheckedIOException(ioe);
         }
