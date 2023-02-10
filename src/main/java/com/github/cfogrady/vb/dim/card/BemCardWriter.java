@@ -4,14 +4,12 @@ import com.github.cfogrady.vb.dim.adventure.BemAdventureWriter;
 import com.github.cfogrady.vb.dim.character.BemCharacterWriter;
 import com.github.cfogrady.vb.dim.fusion.BemFusionWriter;
 import com.github.cfogrady.vb.dim.header.BemHeaderWriter;
-import com.github.cfogrady.vb.dim.sprite.BemSpriteWriter;
-import com.github.cfogrady.vb.dim.sprite.SpriteChecksumAreasCalculator;
-import com.github.cfogrady.vb.dim.sprite.SpriteChecksumHacker;
-import com.github.cfogrady.vb.dim.sprite.SpriteWriter;
+import com.github.cfogrady.vb.dim.sprite.*;
 import com.github.cfogrady.vb.dim.transformation.BemTransformationWriter;
 import com.github.cfogrady.vb.dim.util.ByteUtils;
 import com.github.cfogrady.vb.dim.util.DIMChecksumBuilder;
 import com.github.cfogrady.vb.dim.util.OutputStreamWithNot;
+import com.github.cfogrady.vb.dim.util.RawChecksumBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,7 +30,8 @@ public class BemCardWriter {
     public BemCardWriter() {
         SpriteChecksumAreasCalculator spriteChecksumAreasCalculator = SpriteChecksumAreasCalculator.buildForBEM();
         SpriteChecksumHacker checksumHacker = new SpriteChecksumHacker(spriteChecksumAreasCalculator, SpriteWriter.PIXEL_POINTER_TABLE_START);
-        SpriteWriter spriteWriter = new SpriteWriter(checksumHacker);
+        UnorderedSpriteChecksumHacker unorderedChecksumHacker = new UnorderedSpriteChecksumHacker(spriteChecksumAreasCalculator, SpriteWriter.PIXEL_POINTER_TABLE_START, new RawChecksumBuilder());
+        SpriteWriter spriteWriter = new SpriteWriter(checksumHacker, unorderedChecksumHacker);
         this.bemHeaderWriter = new BemHeaderWriter();
         this.bemCharacterWriter = new BemCharacterWriter();
         this.bemTransformationWriter = new BemTransformationWriter();

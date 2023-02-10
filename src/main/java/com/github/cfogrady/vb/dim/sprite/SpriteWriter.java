@@ -19,6 +19,9 @@ public class SpriteWriter {
     public static final int TERMINATION_BYTES = 0xFFFFFF02;
 
     private final SpriteChecksumHacker checksumHacker;
+    private final UnorderedSpriteChecksumHacker unorderedChecksumHacker;
+
+
     public void writeSpriteData(SpriteData spriteData, boolean hasSpriteSigning, ByteOffsetOutputStream outputStreamWithNot) throws IOException {
         outputStreamWithNot.writeZerosUntilOffset(SPRITE_SECTION_START);
         if(hasSpriteSigning) {
@@ -30,7 +33,8 @@ public class SpriteWriter {
     }
 
     private void writeSpriteDataToMatchChecksum(ByteOffsetOutputStream outputStreamWithNot, SpriteData spriteData) throws IOException {
-        checksumHacker.writeInterweavedSpriteTableAndSpritesWithChecksumFixes(spriteData, outputStreamWithNot);
+        //checksumHacker.writeInterweavedSpriteTableAndSpritesWithChecksumFixes(spriteData, outputStreamWithNot);
+        unorderedChecksumHacker.writeSpritesUnorderedToCorrectChecksums(spriteData, outputStreamWithNot);
     }
 
     private static int calculateTerminationBytesLocation(int firstSpritePointer, List<SpriteData.Sprite> sprites) {

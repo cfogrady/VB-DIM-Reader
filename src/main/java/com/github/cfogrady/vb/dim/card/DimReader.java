@@ -11,12 +11,10 @@ import com.github.cfogrady.vb.dim.fusion.DimSpecificFusions;
 import com.github.cfogrady.vb.dim.fusion.DimSpecificFusionsReader;
 import com.github.cfogrady.vb.dim.header.DimHeader;
 import com.github.cfogrady.vb.dim.header.DimHeaderReader;
-import com.github.cfogrady.vb.dim.sprite.DimSpritesReader;
-import com.github.cfogrady.vb.dim.sprite.SpriteChecksumAreasCalculator;
+import com.github.cfogrady.vb.dim.sprite.*;
 import com.github.cfogrady.vb.dim.transformation.DimEvolutionsReader;
 import com.github.cfogrady.vb.dim.util.ByteUtils;
 import com.github.cfogrady.vb.dim.util.DIMChecksumBuilder;
-import com.github.cfogrady.vb.dim.sprite.SpriteData;
 import com.github.cfogrady.vb.dim.transformation.DimEvolutionRequirements;
 import com.github.cfogrady.vb.dim.util.InputStreamWithNot;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -34,11 +33,15 @@ public class DimReader {
 
     private final BemCardReader bemCardReader;
     private final DimSpritesReader dimSpritesReader;
+    private final UnorderedSpriteReader unorderedSpriteReader;
+    private final BemSpriteReader bemSpriteReader;
 
     public DimReader() {
-
+        SpriteChecksumAreasCalculator spriteChecksumAreasCalculator = SpriteChecksumAreasCalculator.buildForDIM();
         this.bemCardReader = new BemCardReader();
-        this.dimSpritesReader = new DimSpritesReader(SpriteChecksumAreasCalculator.buildForDIM());
+        this.dimSpritesReader = new DimSpritesReader(spriteChecksumAreasCalculator);
+        unorderedSpriteReader = new UnorderedSpriteReader(spriteChecksumAreasCalculator);
+        bemSpriteReader = new BemSpriteReader(dimSpritesReader, unorderedSpriteReader);
     }
 
     public Card readDimCardData(InputStream inputStream, boolean verifyChecksum) {
@@ -85,12 +88,13 @@ public class DimReader {
         DimEvolutionRequirements evolutionRequirements = DimEvolutionsReader.dimEvolutionRequirementsFromBytes(bytes);
         bytes = inputStreamWithNot.readToOffset(0x60000);
         DimAdventures adventures = DimAdventuresReader.dimAdventuresFromBytes(bytes);
-        byte[] spriteDimensions = inputStreamWithNot.readToOffset(0x70000);
+        List<SpriteData.SpriteDimensions> spriteDimensions = bemSpriteReader.readSpriteDimensions(inputStreamWithNot);
+        inputStreamWithNot.readToOffset(0x70000);
         bytes = inputStreamWithNot.readToOffset(0x80000);
         DimFusions fusions = DimFusionsReader.dimFusionsFromBytes(bytes);
         bytes = inputStreamWithNot.readToOffset(0x100000);
         DimSpecificFusions dimSpecificFusions = DimSpecificFusionsReader.dimSpecificFusionsFromBytes(bytes);
-        SpriteData spriteData = dimSpritesReader.spriteDataFromBytesAndStream(spriteDimensions, inputStreamWithNot);
+        SpriteData spriteData = unorderedSpriteReader.spriteDataFromDimensionsAndStream(spriteDimensions, inputStreamWithNot);
         inputStreamWithNot.readToOffset(0x3FFFFE);
         bytes = inputStreamWithNot.readNBytes(2);
         int dimChecksum = ByteUtils.getUnsigned16Bit(bytes)[0];

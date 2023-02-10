@@ -12,4 +12,8 @@ public class SpriteWithIndex {
     public int getSize() {
         return sprite.getByteCountAt16BitPerPixel();
     }
+
+    public byte[] getPixelData() {
+        return sprite.getPixelData();
+    }
 }

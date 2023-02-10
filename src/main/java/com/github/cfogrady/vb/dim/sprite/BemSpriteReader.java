@@ -13,9 +13,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BemSpriteReader {
     private final DimSpritesReader dimSpritesReader;
+    private final UnorderedSpriteReader unorderedSpriteReader;
 
     public BemSpriteReader() {
-        dimSpritesReader = new DimSpritesReader(SpriteChecksumAreasCalculator.buildForBEM());
+        SpriteChecksumAreasCalculator checksumAreasCalculator = SpriteChecksumAreasCalculator.buildForBEM();
+        unorderedSpriteReader = new UnorderedSpriteReader(checksumAreasCalculator);
+        dimSpritesReader = new DimSpritesReader(checksumAreasCalculator);
     }
 
 
@@ -41,7 +44,7 @@ public class BemSpriteReader {
 
     public SpriteData getSpriteData(ByteOffsetInputStream generalInputStream, List<SpriteData.SpriteDimensions> spriteDimensions) {
         try {
-            return dimSpritesReader.spriteDataFromDimensionsAndStream(spriteDimensions, generalInputStream);
+            return unorderedSpriteReader.spriteDataFromDimensionsAndStream(spriteDimensions, generalInputStream);
         } catch (IOException ioe) {
             throw new UncheckedIOException(ioe);
         }

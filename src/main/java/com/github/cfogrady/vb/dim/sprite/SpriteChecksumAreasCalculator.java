@@ -3,6 +3,8 @@ package com.github.cfogrady.vb.dim.sprite;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Getter
 public class SpriteChecksumAreasCalculator {
@@ -96,5 +98,13 @@ public class SpriteChecksumAreasCalculator {
             expected += WORD_SPACE;
             return expected - current;
         }
+    }
+
+    public int getChecksumForLocationFromList(int relativeLocation, List<Integer> checksums) {
+        int checksumPortionIndex = calculateWhichChunk(relativeLocation);
+        if(checksumPortionIndex < 0) {
+            checksumPortionIndex = 0;
+        }
+        return checksums.get(checksumPortionIndex);
     }
 }
