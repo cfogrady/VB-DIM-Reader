@@ -27,9 +27,8 @@ public class DimWriter {
 
     public DimWriter() {
         SpriteChecksumAreasCalculator spriteChecksumAreasCalculator = SpriteChecksumAreasCalculator.buildForDIM();
-        SpriteChecksumHacker checksumHacker = new SpriteChecksumHacker(spriteChecksumAreasCalculator, SpriteWriter.PIXEL_POINTER_TABLE_START);
         UnorderedSpriteChecksumHacker unorderedChecksumHacker = new UnorderedSpriteChecksumHacker(spriteChecksumAreasCalculator, SpriteWriter.PIXEL_POINTER_TABLE_START, new RawChecksumBuilder());
-        spriteWriter = new SpriteWriter(checksumHacker, unorderedChecksumHacker);
+        spriteWriter = new SpriteWriter(unorderedChecksumHacker);
         bemCardWriter = new BemCardWriter();
     }
 

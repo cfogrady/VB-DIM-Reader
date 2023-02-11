@@ -22,9 +22,8 @@ public class BemSpriteReaderTest {
     void setup() {
         this.bemSpriteReader = new BemSpriteReader();
         SpriteChecksumAreasCalculator spriteChecksumAreasCalculator = SpriteChecksumAreasCalculator.buildForBEM();
-        SpriteChecksumHacker checksumHacker = new SpriteChecksumHacker(spriteChecksumAreasCalculator, SpriteWriter.PIXEL_POINTER_TABLE_START);
         UnorderedSpriteChecksumHacker unorderChecksumHacker = new UnorderedSpriteChecksumHacker(spriteChecksumAreasCalculator, SpriteWriter.PIXEL_POINTER_TABLE_START, new RawChecksumBuilder());
-        SpriteWriter spriteWriter = new SpriteWriter(checksumHacker, unorderChecksumHacker);
+        SpriteWriter spriteWriter = new SpriteWriter(unorderChecksumHacker);
         this.bemSpriteWriter = new BemSpriteWriter(spriteWriter);
     }
 

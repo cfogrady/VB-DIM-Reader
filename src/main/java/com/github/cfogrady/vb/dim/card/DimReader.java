@@ -32,16 +32,14 @@ public class DimReader {
     public static final int NONE_VALUE = 65535;
 
     private final BemCardReader bemCardReader;
-    private final DimSpritesReader dimSpritesReader;
     private final UnorderedSpriteReader unorderedSpriteReader;
     private final BemSpriteReader bemSpriteReader;
 
     public DimReader() {
         SpriteChecksumAreasCalculator spriteChecksumAreasCalculator = SpriteChecksumAreasCalculator.buildForDIM();
         this.bemCardReader = new BemCardReader();
-        this.dimSpritesReader = new DimSpritesReader(spriteChecksumAreasCalculator);
         unorderedSpriteReader = new UnorderedSpriteReader(spriteChecksumAreasCalculator);
-        bemSpriteReader = new BemSpriteReader(dimSpritesReader, unorderedSpriteReader);
+        bemSpriteReader = new BemSpriteReader(unorderedSpriteReader);
     }
 
     public Card readCard(InputStream inputStream, boolean verifyChecksum) {

@@ -18,7 +18,6 @@ public class SpriteWriter {
     public static final int TERMINATION_BYTES_OF_POINTER_TABLE = 0x18;
     public static final int TERMINATION_BYTES = 0xFFFFFF02;
 
-    private final SpriteChecksumHacker checksumHacker;
     private final UnorderedSpriteChecksumHacker unorderedChecksumHacker;
 
 
@@ -29,11 +28,9 @@ public class SpriteWriter {
         } else {
             writeUnmodified(spriteData, outputStreamWithNot);
         }
-
     }
 
     private void writeSpriteDataToMatchChecksum(ByteOffsetOutputStream outputStreamWithNot, SpriteData spriteData) throws IOException {
-        //checksumHacker.writeInterweavedSpriteTableAndSpritesWithChecksumFixes(spriteData, outputStreamWithNot);
         unorderedChecksumHacker.writeSpritesUnorderedToCorrectChecksums(spriteData, outputStreamWithNot);
     }
 

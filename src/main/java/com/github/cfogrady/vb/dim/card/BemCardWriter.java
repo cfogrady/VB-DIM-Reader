@@ -29,9 +29,8 @@ public class BemCardWriter {
 
     public BemCardWriter() {
         SpriteChecksumAreasCalculator spriteChecksumAreasCalculator = SpriteChecksumAreasCalculator.buildForBEM();
-        SpriteChecksumHacker checksumHacker = new SpriteChecksumHacker(spriteChecksumAreasCalculator, SpriteWriter.PIXEL_POINTER_TABLE_START);
         UnorderedSpriteChecksumHacker unorderedChecksumHacker = new UnorderedSpriteChecksumHacker(spriteChecksumAreasCalculator, SpriteWriter.PIXEL_POINTER_TABLE_START, new RawChecksumBuilder());
-        SpriteWriter spriteWriter = new SpriteWriter(checksumHacker, unorderedChecksumHacker);
+        SpriteWriter spriteWriter = new SpriteWriter(unorderedChecksumHacker);
         this.bemHeaderWriter = new BemHeaderWriter();
         this.bemCharacterWriter = new BemCharacterWriter();
         this.bemTransformationWriter = new BemTransformationWriter();

@@ -12,13 +12,11 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class BemSpriteReader {
-    private final DimSpritesReader dimSpritesReader;
     private final UnorderedSpriteReader unorderedSpriteReader;
 
     public BemSpriteReader() {
         SpriteChecksumAreasCalculator checksumAreasCalculator = SpriteChecksumAreasCalculator.buildForBEM();
         unorderedSpriteReader = new UnorderedSpriteReader(checksumAreasCalculator);
-        dimSpritesReader = new DimSpritesReader(checksumAreasCalculator);
     }
 
 
@@ -27,14 +25,14 @@ public class BemSpriteReader {
             RelativeByteOffsetInputStream relativeInputStream = new RelativeByteOffsetInputStream(generalInputStream);
             List<SpriteData.SpriteDimensions> dimensions = new ArrayList<>();
             int[] values = getDimensionRowValues(relativeInputStream);
-            boolean validRow = !anyZeros(values);
+            boolean validRow = noZeros(values);
             while (validRow) {
                 dimensions.add(SpriteData.SpriteDimensions.builder()
                         .width(values[0])
                         .height(values[1])
                         .build());
                 values = getDimensionRowValues(relativeInputStream);
-                validRow = !anyZeros(values);
+                validRow = noZeros(values);
             }
             return dimensions;
         } catch (IOException ioe) {
@@ -55,12 +53,12 @@ public class BemSpriteReader {
         return ByteUtils.getUnsigned16Bit(rowBytes);
     }
 
-    private boolean anyZeros(int[] values) {
+    private boolean noZeros(int[] values) {
         for(int value : values) {
             if(value == 0) {
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 }
