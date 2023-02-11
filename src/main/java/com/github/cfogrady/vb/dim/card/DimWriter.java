@@ -22,6 +22,7 @@ import java.io.UncheckedIOException;
 @Slf4j
 @RequiredArgsConstructor
 public class DimWriter {
+    private final BemCardWriter bemCardWriter;
     private final SpriteWriter spriteWriter;
 
     public DimWriter() {
@@ -29,6 +30,7 @@ public class DimWriter {
         SpriteChecksumHacker checksumHacker = new SpriteChecksumHacker(spriteChecksumAreasCalculator, SpriteWriter.PIXEL_POINTER_TABLE_START);
         UnorderedSpriteChecksumHacker unorderedChecksumHacker = new UnorderedSpriteChecksumHacker(spriteChecksumAreasCalculator, SpriteWriter.PIXEL_POINTER_TABLE_START, new RawChecksumBuilder());
         spriteWriter = new SpriteWriter(checksumHacker, unorderedChecksumHacker);
+        bemCardWriter = new BemCardWriter();
     }
 
     public static final int NONE_VALUE = DimReader.NONE_VALUE;
@@ -50,6 +52,16 @@ public class DimWriter {
         } catch (IOException e) {
             log.error("Failed to write DIM file!", e);
             throw new UncheckedIOException(e);
+        }
+    }
+    
+    public void writeCard(Card card, OutputStream outputStream) {
+        if(card instanceof DimCard) {
+            writeDimData((DimCard) card, outputStream);
+        } else if(card instanceof BemCard) {
+            bemCardWriter.writeBemCard((BemCard) card, outputStream);
+        } else {
+            throw new IllegalArgumentException("Unrecognized card type: " + card.getContentType().name());
         }
     }
 }

@@ -44,7 +44,7 @@ public class DimReader {
         bemSpriteReader = new BemSpriteReader(dimSpritesReader, unorderedSpriteReader);
     }
 
-    public Card readDimCardData(InputStream inputStream, boolean verifyChecksum) {
+    public Card readCard(InputStream inputStream, boolean verifyChecksum) {
         DIMChecksumBuilder checksumBuilder = new DIMChecksumBuilder();
         InputStreamWithNot inputStreamWithNot = new InputStreamWithNot(inputStream, checksumBuilder);
         try {
