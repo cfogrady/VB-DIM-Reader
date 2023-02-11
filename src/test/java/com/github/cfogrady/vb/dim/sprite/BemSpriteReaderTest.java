@@ -1,5 +1,6 @@
 package com.github.cfogrady.vb.dim.sprite;
 
+import com.github.cfogrady.vb.dim.util.RawChecksumBuilder;
 import com.github.cfogrady.vb.dim.util.RelativeByteOffsetInputStream;
 import com.github.cfogrady.vb.dim.util.RelativeByteOffsetOutputStream;
 import org.junit.jupiter.api.Assertions;
@@ -21,8 +22,8 @@ public class BemSpriteReaderTest {
     void setup() {
         this.bemSpriteReader = new BemSpriteReader();
         SpriteChecksumAreasCalculator spriteChecksumAreasCalculator = SpriteChecksumAreasCalculator.buildForBEM();
-        SpriteChecksumHacker checksumHacker = new SpriteChecksumHacker(spriteChecksumAreasCalculator, SpriteWriter.PIXEL_POINTER_TABLE_START);
-        SpriteWriter spriteWriter = new SpriteWriter(checksumHacker);
+        UnorderedSpriteChecksumHacker unorderChecksumHacker = new UnorderedSpriteChecksumHacker(spriteChecksumAreasCalculator, SpriteWriter.PIXEL_POINTER_TABLE_START, new RawChecksumBuilder());
+        SpriteWriter spriteWriter = new SpriteWriter(unorderChecksumHacker);
         this.bemSpriteWriter = new BemSpriteWriter(spriteWriter);
     }
 
