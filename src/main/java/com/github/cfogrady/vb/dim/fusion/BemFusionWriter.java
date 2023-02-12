@@ -8,10 +8,10 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 
 public class BemFusionWriter {
-    public void writeAttributeFusions(BemAttributeFusions attributeFusions, ByteOffsetOutputStream generalOutputStream) {
+    public void writeAttributeFusions(AttributeFusions attributeFusions, ByteOffsetOutputStream generalOutputStream) {
         try {
             int index = 0;
-            for(BemAttributeFusions.BemAttributeFusionEntry entry : attributeFusions.getEntries()) {
+            for(AttributeFusions.AttributeFusionEntry entry : attributeFusions.getEntries()) {
                 generalOutputStream.write16BitInt(entry.getCharacterIndex());
                 generalOutputStream.write16BitInt(entry.getAttribute3Fusion());
                 generalOutputStream.write16BitInt(entry.getAttribute2Fusion());
@@ -35,8 +35,8 @@ public class BemFusionWriter {
                 generalOutputStream.write16BitInt(entry.getFromCharacterIndex());
                 generalOutputStream.write16BitInt(entry.getToBemId());
                 generalOutputStream.write16BitInt(entry.getToCharacterIndex());
-                generalOutputStream.write16BitInt(entry.getBackupBemId());
-                generalOutputStream.write16BitInt(entry.getBackupCharacterId());
+                generalOutputStream.write16BitInt(entry.getBackupDimId());
+                generalOutputStream.write16BitInt(entry.getBackupCharacterIndex());
                 index++;
             }
             for(int i = index; i < BemFusionConstants.MAX_SPECIFIC_TABLE_SIZE; i++) {

@@ -32,13 +32,13 @@ public class DimEvolutionsReader {
                     log.warn("Unexpected value {} at index {}-{} in evolution table for DIM. Please make an issue with the DIM card in question on https://github.com/cfogrady/DIM-Modifier/issues so I purchase and analyze the card", values[index+11], index/12, 11);
                 }
                 DimEvolutionRequirements.DimEvolutionRequirementBlock block = DimEvolutionRequirements.DimEvolutionRequirementBlock.builder()
-                        .evolveFromStatIndex(values[index])
+                        .fromCharacterIndex(values[index])
                         .hoursUntilEvolution(values[index+1])
-                        .vitalRequirements(values[index+2])
-                        .trophyRequirement(values[index+4])
-                        .battleRequirement(values[index+6])
-                        .winRatioRequirement(values[index+8])
-                        .evolveToStatIndex(values[index+10])
+                        .requiredVitalValues(values[index+2])
+                        .requiredTrophies(values[index+4])
+                        .requiredBattles(values[index+6])
+                        .requiredWinRatio(values[index+8])
+                        .toCharacterIndex(values[index+10])
                         .build();
                 evolutionRequirementBlocks.add(block);
             } else {
@@ -47,6 +47,6 @@ public class DimEvolutionsReader {
             index += 12;
             onlyZeroRow = ByteUtils.onlyZerosInRange(values, index, 12); //find out if the next row is only zeros
         }
-        return DimEvolutionRequirements.builder().evolutionRequirementBlocks(evolutionRequirementBlocks).dummyRows(dummyRows).build();
+        return DimEvolutionRequirements.builder().transformationEntries(evolutionRequirementBlocks).dummyRows(dummyRows).build();
     }
 }

@@ -10,7 +10,7 @@ public class StatsWriter {
     public static void writeStats(DimStats stats, OutputStreamWithNot outputStreamWithNot) throws IOException {
         outputStreamWithNot.writeZerosUntilOffset(0x30000);
         int currentSlot = 0;
-        for(DimStats.DimStatBlock statsBlock : stats.getStatBlocks()) {
+        for(DimStats.DimStatBlock statsBlock : stats.getCharacterEntries()) {
             outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(statsBlock.getStage()));
             if(statsBlock.isUnlockRequired()) {
                 outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(1));
@@ -18,7 +18,7 @@ public class StatsWriter {
                 outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(DimWriter.NONE_VALUE));
             }
             outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(statsBlock.getAttribute()));
-            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(statsBlock.getDisposition()));
+            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(statsBlock.getType()));
             outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(statsBlock.getSmallAttackId()));
             outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(statsBlock.getBigAttackId()));
             outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(statsBlock.getDpStars()));

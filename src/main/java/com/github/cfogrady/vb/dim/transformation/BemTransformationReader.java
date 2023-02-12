@@ -1,6 +1,5 @@
 package com.github.cfogrady.vb.dim.transformation;
 
-import com.github.cfogrady.vb.dim.character.BemCharacterConstants;
 import com.github.cfogrady.vb.dim.util.ByteOffsetInputStream;
 import com.github.cfogrady.vb.dim.util.ByteUtils;
 import com.github.cfogrady.vb.dim.util.RelativeByteOffsetInputStream;
@@ -22,7 +21,7 @@ public class BemTransformationReader {
                                 .fromCharacterIndex(values[0])
                                 .minutesUntilTransformation(values[1])
                                 .requiredVitalValues(values[2])
-                                .requiredPp(values[3])
+                                .requiredTrophies(values[3])
                                 .requiredBattles(values[4])
                                 .requiredWinRatio(values[5])
                                 .minimumMinuteOfHour(values[6])

@@ -12,14 +12,14 @@ public class SpecificFusionsWriter {
     public static void writeSpecificFusions(DimSpecificFusions specificFusions, OutputStreamWithNot outputStreamWithNot) throws IOException {
         outputStreamWithNot.writeZerosUntilOffset(0x80000);
         int currentIndex = 0;
-        for(DimSpecificFusions.DimSpecificFusionBlock specificFusionEntry : specificFusions.getDimSpecificFusionBlocks()) {
-            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(specificFusionEntry.getStatsIndex()));
-            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(specificFusionEntry.getStatsIndexForFusionResult()));
-            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(specificFusionEntry.getFusionDimId()));
-            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(specificFusionEntry.getFusionDimSlotId()));
+        for(SpecificFusions.SpecificFusionEntry specificFusionEntry : specificFusions.getEntries()) {
+            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(specificFusionEntry.getFromCharacterIndex()));
+            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(specificFusionEntry.getToCharacterIndex()));
+            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(specificFusionEntry.getBackupDimId()));
+            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(specificFusionEntry.getBackupCharacterIndex()));
             currentIndex++;
         }
-        if(specificFusions.getDimSpecificFusionBlocks().size() > 1) {
+        if(specificFusions.getEntries().size() > 1) {
             log.warn("More than one specific fusion may not work...");
         }
         if(specificFusions.getDummyRows() > 0 && currentIndex < DimSpecificFusions.VB_TABLE_SIZE) {

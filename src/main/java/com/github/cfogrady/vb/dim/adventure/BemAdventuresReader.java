@@ -1,10 +1,7 @@
 package com.github.cfogrady.vb.dim.adventure;
 
-import com.github.cfogrady.vb.dim.character.BemCharacterConstants;
-import com.github.cfogrady.vb.dim.character.BemCharacterStats;
 import com.github.cfogrady.vb.dim.util.ByteOffsetInputStream;
 import com.github.cfogrady.vb.dim.util.ByteUtils;
-import com.github.cfogrady.vb.dim.util.InputStreamWithNot;
 import com.github.cfogrady.vb.dim.util.RelativeByteOffsetInputStream;
 
 import java.io.IOException;
@@ -24,9 +21,9 @@ public class BemAdventuresReader {
                         .steps(values[0])
                         .bossCharacterIndex(values[1])
                         .showBossIdentity(values[2])
-                        .bp(values[3])
-                        .hp(values[4])
-                        .ap(values[5])
+                        .bossDp(values[3])
+                        .bossHp(values[4])
+                        .bossAp(values[5])
                         .smallAttackId(values[6])
                         .bigAttackId(values[7])
                         .background1(values[8])

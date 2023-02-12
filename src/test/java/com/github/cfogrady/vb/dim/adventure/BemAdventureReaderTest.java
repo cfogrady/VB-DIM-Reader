@@ -36,9 +36,9 @@ public class BemAdventureReaderTest {
             Assertions.assertEquals(expected.getSteps(), read.getSteps());
             Assertions.assertEquals(expected.getBossCharacterIndex(), read.getBossCharacterIndex());
             Assertions.assertEquals(expected.getShowBossIdentity(), read.getShowBossIdentity());
-            Assertions.assertEquals(expected.getBp(), read.getBp());
-            Assertions.assertEquals(expected.getHp(), read.getHp());
-            Assertions.assertEquals(expected.getAp(), read.getAp());
+            Assertions.assertEquals(expected.getBossDp(), read.getBossDp());
+            Assertions.assertEquals(expected.getBossHp(), read.getBossHp());
+            Assertions.assertEquals(expected.getBossAp(), read.getBossAp());
             Assertions.assertEquals(expected.getSmallAttackId(), read.getSmallAttackId());
             Assertions.assertEquals(expected.getBigAttackId(), read.getBigAttackId());
             Assertions.assertEquals(expected.getBackground1(), read.getBackground1());
@@ -54,9 +54,9 @@ public class BemAdventureReaderTest {
                     .steps(random.nextInt(2401)+100)
                     .bossCharacterIndex(random.nextInt(23))
                     .showBossIdentity(random.nextInt(2))
-                    .bp(random.nextInt(6000))
-                    .hp(random.nextInt(6000))
-                    .ap(random.nextInt(6000))
+                    .bossDp(random.nextInt(6000))
+                    .bossHp(random.nextInt(6000))
+                    .bossAp(random.nextInt(6000))
                     .smallAttackId(random.nextInt(39))
                     .bigAttackId(random.nextInt(21))
                     .background1(random.nextInt(6))

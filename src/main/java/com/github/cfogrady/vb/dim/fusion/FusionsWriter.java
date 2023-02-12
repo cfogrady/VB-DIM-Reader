@@ -10,12 +10,12 @@ public class FusionsWriter {
     public static void writeFusions(DimFusions dimFusions, OutputStreamWithNot outputStreamWithNot) throws IOException {
         int currentIndex = 0;
         outputStreamWithNot.writeZerosUntilOffset(0x70000);
-        for(DimFusions.DimFusionBlock fusionEntry : dimFusions.getFusionBlocks()) {
-            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(fusionEntry.getStatsIndex()));
-            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(fusionEntry.getStatsIndexForFusionWithType3()));
-            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(fusionEntry.getStatsIndexForFusionWithType2()));
-            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(fusionEntry.getStatsIndexForFusionWithType1()));
-            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(fusionEntry.getStatsIndexForFusionWithType4()));
+        for(DimFusions.AttributeFusionEntry fusionEntry : dimFusions.getEntries()) {
+            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(fusionEntry.getCharacterIndex()));
+            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(fusionEntry.getAttribute3Fusion()));
+            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(fusionEntry.getAttribute2Fusion()));
+            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(fusionEntry.getAttribute1Fusion()));
+            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(fusionEntry.getAttribute4Fusion()));
             currentIndex++;
         }
         if(dimFusions.getDummyRows() > 0 && currentIndex < DimFusions.VB_TABLE_SIZE) {

@@ -1,8 +1,5 @@
 package com.github.cfogrady.vb.dim.fusion;
 
-import com.github.cfogrady.vb.dim.sprite.BemSpriteReader;
-import com.github.cfogrady.vb.dim.sprite.BemSpriteWriter;
-import com.github.cfogrady.vb.dim.sprite.SpriteData;
 import com.github.cfogrady.vb.dim.util.RelativeByteOffsetInputStream;
 import com.github.cfogrady.vb.dim.util.RelativeByteOffsetOutputStream;
 import org.junit.jupiter.api.Assertions;
@@ -28,14 +25,14 @@ public class FusionReaderTest {
 
     @Test
     void testReadAttributeFusion() {
-        BemAttributeFusions expectedAttributeFusions = createAttributeFusions();
+        AttributeFusions expectedAttributeFusions = createAttributeFusions();
         byte[] table = getAttributeTableInBytes(expectedAttributeFusions);
         Assertions.assertEquals(BemFusionConstants.MAX_ATTRIBUTE_TABLE_SIZE*BemFusionConstants.ATTRIBUTE_TABLE_ROW_SIZE*2, table.length);
-        BemAttributeFusions readAttributeFusions = bemFusionReader.readAttributeFusion(new RelativeByteOffsetInputStream(new ByteArrayInputStream(table)));
+        AttributeFusions readAttributeFusions = bemFusionReader.readAttributeFusion(new RelativeByteOffsetInputStream(new ByteArrayInputStream(table)));
         Assertions.assertEquals(expectedAttributeFusions.getEntries().size(), readAttributeFusions.getEntries().size());
         for(int i = 0; i < readAttributeFusions.getEntries().size(); i++) {
-            BemAttributeFusions.BemAttributeFusionEntry expected = expectedAttributeFusions.getEntries().get(i);
-            BemAttributeFusions.BemAttributeFusionEntry read = readAttributeFusions.getEntries().get(i);
+            AttributeFusions.AttributeFusionEntry expected = expectedAttributeFusions.getEntries().get(i);
+            AttributeFusions.AttributeFusionEntry read = readAttributeFusions.getEntries().get(i);
             Assertions.assertEquals(expected.getCharacterIndex(), read.getCharacterIndex());
             Assertions.assertEquals(expected.getAttribute3Fusion(), read.getAttribute3Fusion());
             Assertions.assertEquals(expected.getAttribute2Fusion(), read.getAttribute2Fusion());
@@ -58,15 +55,15 @@ public class FusionReaderTest {
             Assertions.assertEquals(expected.getFromCharacterIndex(), read.getFromCharacterIndex());
             Assertions.assertEquals(expected.getToBemId(), read.getToBemId());
             Assertions.assertEquals(expected.getToCharacterIndex(), read.getToCharacterIndex());
-            Assertions.assertEquals(expected.getBackupBemId(), read.getBackupBemId());
-            Assertions.assertEquals(expected.getBackupCharacterId(), read.getBackupCharacterId());
+            Assertions.assertEquals(expected.getBackupDimId(), read.getBackupDimId());
+            Assertions.assertEquals(expected.getBackupCharacterIndex(), read.getBackupCharacterIndex());
         }
     }
 
-    private BemAttributeFusions createAttributeFusions() {
-        List<BemAttributeFusions.BemAttributeFusionEntry> entries = new ArrayList<>(BemFusionConstants.MAX_ATTRIBUTE_TABLE_SIZE);
+    private AttributeFusions createAttributeFusions() {
+        List<AttributeFusions.AttributeFusionEntry> entries = new ArrayList<>(BemFusionConstants.MAX_ATTRIBUTE_TABLE_SIZE);
         for(int i = 0; i < BemFusionConstants.MAX_ATTRIBUTE_TABLE_SIZE; i++) {
-            entries.add(BemAttributeFusions.BemAttributeFusionEntry.builder()
+            entries.add(AttributeFusions.AttributeFusionEntry.builder()
                     .characterIndex(random.nextInt(23))
                     .attribute3Fusion(random.nextInt(23))
                     .attribute2Fusion(random.nextInt(23))
@@ -74,7 +71,7 @@ public class FusionReaderTest {
                     .attribute4Fusion(random.nextInt(23))
                     .build());
         }
-        return BemAttributeFusions.builder().entries(entries).build();
+        return AttributeFusions.builder().entries(entries).build();
     }
 
     private BemSpecificFusions createSpecificFusions() {
@@ -85,14 +82,14 @@ public class FusionReaderTest {
                     .fromCharacterIndex(random.nextInt(23))
                     .toBemId(random.nextInt(64))
                     .toCharacterIndex(random.nextInt(23))
-                    .backupBemId(random.nextInt(64))
-                    .backupCharacterId(random.nextInt(23))
+                    .backupDimId(random.nextInt(64))
+                    .backupCharacterIndex(random.nextInt(23))
                     .build());
         }
         return BemSpecificFusions.builder().entries(entries).build();
     }
 
-    private byte[] getAttributeTableInBytes(BemAttributeFusions attributeFusions) {
+    private byte[] getAttributeTableInBytes(AttributeFusions attributeFusions) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         bemFusionWriter.writeAttributeFusions(attributeFusions, new RelativeByteOffsetOutputStream(outputStream));
         return outputStream.toByteArray();

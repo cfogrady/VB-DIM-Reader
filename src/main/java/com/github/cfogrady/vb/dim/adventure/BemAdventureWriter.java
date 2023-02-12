@@ -14,9 +14,9 @@ public class BemAdventureWriter {
                 relativeOutputStream.write16BitInt(level.getSteps());
                 relativeOutputStream.write16BitInt(level.getBossCharacterIndex());
                 relativeOutputStream.write16BitInt(level.getShowBossIdentity());
-                relativeOutputStream.write16BitInt(level.getBp());
-                relativeOutputStream.write16BitInt(level.getHp());
-                relativeOutputStream.write16BitInt(level.getAp());
+                relativeOutputStream.write16BitInt(level.getBossDp());
+                relativeOutputStream.write16BitInt(level.getBossHp());
+                relativeOutputStream.write16BitInt(level.getBossAp());
                 relativeOutputStream.write16BitInt(level.getSmallAttackId());
                 relativeOutputStream.write16BitInt(level.getBigAttackId());
                 relativeOutputStream.write16BitInt(level.getBackground1());

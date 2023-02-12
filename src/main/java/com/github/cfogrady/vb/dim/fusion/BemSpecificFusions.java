@@ -1,23 +1,22 @@
 package com.github.cfogrady.vb.dim.fusion;
 
-import lombok.Builder;
 import lombok.Data;
-
-import java.util.List;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder(toBuilder = true)
-public class BemSpecificFusions {
+@SuperBuilder(toBuilder = true)
+@EqualsAndHashCode(callSuper = true)
+public class BemSpecificFusions extends SpecificFusions<BemSpecificFusions.BemSpecificFusionEntry> {
     @Data
-    @Builder(toBuilder = true)
-    public static class BemSpecificFusionEntry {
+    @SuperBuilder(toBuilder = true)
+    @EqualsAndHashCode(callSuper = true)
+    public static class BemSpecificFusionEntry extends SpecificFusions.SpecificFusionEntry {
         private final int fromBemId;
-        private final int fromCharacterIndex;
         private final int toBemId;
-        private final int toCharacterIndex;
-        private final int backupBemId;
-        private final int backupCharacterId;
-    }
 
-    private final List<BemSpecificFusionEntry> entries;
+        public int getBackupBemId() {
+            return getBackupDimId();
+        }
+    }
 }

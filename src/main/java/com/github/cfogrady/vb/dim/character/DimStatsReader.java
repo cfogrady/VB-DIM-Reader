@@ -20,11 +20,11 @@ public class DimStatsReader {
                     log.warn("Row found with values but invalid stage! There are two official GP DIMs with this bug. Treating as a dummy row still");
                     dummyRows++;
                 } else {
-                    DimStats.DimStatBlock block = DimStats.DimStatBlock.builder()
+                     DimStats.DimStatBlock block = DimStats.DimStatBlock.builder()
                             .stage(values[index])
                             .unlockRequired(values[index+1] == 1)
                             .attribute(values[index+2])
-                            .disposition(values[index+3])
+                            .type(values[index+3])
                             .smallAttackId(values[index+4])
                             .bigAttackId(values[index+5])
                             .dpStars(values[index+6])
@@ -43,6 +43,6 @@ public class DimStatsReader {
             index += 12;
             onlyZeroRow = ByteUtils.onlyZerosInRange(values, index, 12); //find out if the next row is only zeros
         }
-        return DimStats.builder().statBlocks(statBlocks).dummyRows(dummyRows).build();
+        return DimStats.builder().characterEntries(statBlocks).dummyRows(dummyRows).build();
     }
 }
