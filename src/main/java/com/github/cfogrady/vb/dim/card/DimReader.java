@@ -104,12 +104,12 @@ public class DimReader {
             }
         }
         return DimCard.builder()
-                .dimHeader(header)
-                .dimStats(stats)
-                .dimEvolutionRequirements(evolutionRequirements)
-                .dimAdventures(adventures)
-                .dimFusions(fusions)
-                .dimSpecificFusion(dimSpecificFusions)
+                .header(header)
+                .characterStats(stats)
+                .transformationRequirements(evolutionRequirements)
+                .adventureLevels(adventures)
+                .attributeFusions(fusions)
+                .specificFusions(dimSpecificFusions)
                 .spriteData(spriteData)
                 .checksum(dimChecksum)
                 .calculatedCheckSum(calculatedChecksum)

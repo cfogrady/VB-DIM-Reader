@@ -5,7 +5,7 @@ import com.github.cfogrady.vb.dim.adventure.BemAdventureLevels;
 import com.github.cfogrady.vb.dim.adventure.BemAdventuresReader;
 import com.github.cfogrady.vb.dim.character.BemCharacterReader;
 import com.github.cfogrady.vb.dim.character.BemCharacterStats;
-import com.github.cfogrady.vb.dim.fusion.BemAttributeFusions;
+import com.github.cfogrady.vb.dim.fusion.AttributeFusions;
 import com.github.cfogrady.vb.dim.fusion.BemFusionReader;
 import com.github.cfogrady.vb.dim.fusion.BemSpecificFusions;
 import com.github.cfogrady.vb.dim.header.BemHeader;
@@ -68,7 +68,7 @@ public class BemCardReader {
             inputStream.readToOffset(BemCardConstants.SPRITE_DIMENSIONS_START);
             List<SpriteData.SpriteDimensions> spriteDimensions = bemSpriteReader.readSpriteDimensions(inputStream);
             inputStream.readToOffset(BemCardConstants.ATTRIBUTE_FUSION_START);
-            BemAttributeFusions attributeFusions = bemFusionReader.readAttributeFusion(inputStream);
+            AttributeFusions attributeFusions = bemFusionReader.readAttributeFusion(inputStream);
             inputStream.readToOffset(BemCardConstants.SPECIFIC_FUSION_START);
             BemSpecificFusions specificFusions = bemFusionReader.readSpecificFusions(inputStream);
             inputStream.readToOffset(BemCardConstants.SPRITE_PACKAGE_START);
@@ -80,12 +80,12 @@ public class BemCardReader {
             }
 
             return BemCard.builder()
-                    .bemHeader(header)
-                    .bemCharacterStats(characters)
-                    .bemTransformationRequirements(transformations)
-                    .bemAdventureLevels(adventureLevels)
-                    .bemAttributeFusions(attributeFusions)
-                    .bemSpecificFusions(specificFusions)
+                    .header(header)
+                    .characterStats(characters)
+                    .transformationRequirements(transformations)
+                    .adventureLevels(adventureLevels)
+                    .attributeFusions(attributeFusions)
+                    .specificFusions(specificFusions)
                     .spriteData(spriteData)
                     .calculatedCheckSum(calculatedChecksum)
                     .checksum(checksumOnCard)

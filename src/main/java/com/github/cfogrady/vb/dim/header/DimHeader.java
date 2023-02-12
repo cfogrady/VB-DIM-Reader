@@ -1,10 +1,11 @@
 package com.github.cfogrady.vb.dim.header;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 
-@SuperBuilder(toBuilder = true)
 @Data
+@SuperBuilder(toBuilder = true)
 public class DimHeader {
 	private final String text;
 	private final int dimId;

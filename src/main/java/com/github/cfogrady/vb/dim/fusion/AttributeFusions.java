@@ -1,16 +1,16 @@
 package com.github.cfogrady.vb.dim.fusion;
 
-import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
 @Data
-@Builder(toBuilder = true)
-public class BemAttributeFusions {
+@SuperBuilder(toBuilder = true)
+public class AttributeFusions {
     @Data
-    @Builder(toBuilder = true)
-    public static class BemAttributeFusionEntry {
+    @SuperBuilder(toBuilder = true)
+    public static class AttributeFusionEntry {
         private final int characterIndex;
         private final int attribute3Fusion;
         private final int attribute2Fusion;
@@ -18,5 +18,5 @@ public class BemAttributeFusions {
         private final int attribute4Fusion;
     }
 
-    private final List<BemAttributeFusionEntry> entries;
+    private final List<AttributeFusionEntry> entries;
 }

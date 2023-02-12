@@ -38,14 +38,14 @@ public class DimWriter {
         DIMChecksumBuilder checksumBuilder = new DIMChecksumBuilder();
         OutputStreamWithNot outputStreamWithNot = OutputStreamWithNot.wrap(outputStream, checksumBuilder);
         try {
-            HeaderWriter.writeHeader(dimContent.getDimHeader(), outputStreamWithNot);
-            StatsWriter.writeStats(dimContent.getDimStats(), outputStreamWithNot);
-            EvolutionsWriter.writeEvolutions(dimContent.getDimEvolutionRequirements(), outputStreamWithNot);
-            AdventuresWriter.writeAdventures(dimContent.getDimAdventures(), outputStreamWithNot);
+            HeaderWriter.writeHeader(dimContent.getHeader(), outputStreamWithNot);
+            StatsWriter.writeStats(dimContent.getCharacterStats(), outputStreamWithNot);
+            EvolutionsWriter.writeEvolutions(dimContent.getTransformationRequirements(), outputStreamWithNot);
+            AdventuresWriter.writeAdventures(dimContent.getAdventureLevels(), outputStreamWithNot);
             SpriteDimentionsWriter.writeSpriteDimensions(dimContent.getSpriteData(), outputStreamWithNot);
-            FusionsWriter.writeFusions(dimContent.getDimFusions(), outputStreamWithNot);
-            SpecificFusionsWriter.writeSpecificFusions(dimContent.getDimSpecificFusion(), outputStreamWithNot);
-            spriteWriter.writeSpriteData(dimContent.getSpriteData(), dimContent.getDimHeader().hasSpriteSignature(), outputStreamWithNot);
+            FusionsWriter.writeFusions(dimContent.getAttributeFusions(), outputStreamWithNot);
+            SpecificFusionsWriter.writeSpecificFusions(dimContent.getSpecificFusions(), outputStreamWithNot);
+            spriteWriter.writeSpriteData(dimContent.getSpriteData(), dimContent.getHeader().hasSpriteSignature(), outputStreamWithNot);
             outputStreamWithNot.writeZerosUntilOffset(0x3ffffe);
             outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(outputStreamWithNot.getChecksum()));
         } catch (IOException e) {
@@ -60,7 +60,7 @@ public class DimWriter {
         } else if(card instanceof BemCard) {
             bemCardWriter.writeBemCard((BemCard) card, outputStream);
         } else {
-            throw new IllegalArgumentException("Unrecognized card type: " + card.getContentType().name());
+            throw new IllegalArgumentException("Unrecognized card type: " + card.getClass().getName());
         }
     }
 }

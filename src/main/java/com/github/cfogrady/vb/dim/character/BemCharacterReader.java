@@ -24,7 +24,7 @@ public class BemCharacterReader {
                         .type(values[3])
                         .smallAttackId(values[4])
                         .bigAttackId(values[5])
-                        .bp(values[6])
+                        .dp(values[6])
                         .hp(values[7])
                         .ap(values[8])
                         .firstPoolBattleChance(values[9])

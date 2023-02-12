@@ -12,14 +12,14 @@ import java.util.List;
 
 @Slf4j
 public class BemFusionReader {
-    public BemAttributeFusions readAttributeFusion(ByteOffsetInputStream generalInputStream) {
+    public AttributeFusions readAttributeFusion(ByteOffsetInputStream generalInputStream) {
         try {
             RelativeByteOffsetInputStream relativeInputStream = new RelativeByteOffsetInputStream(generalInputStream);
-            List<BemAttributeFusions.BemAttributeFusionEntry> attributeFusions = new ArrayList<>(BemFusionConstants.MAX_ATTRIBUTE_TABLE_SIZE);
+            List<AttributeFusions.AttributeFusionEntry> attributeFusions = new ArrayList<>(BemFusionConstants.MAX_ATTRIBUTE_TABLE_SIZE);
             int[] values = getAttributeRowValues(relativeInputStream);
             boolean validRow = !ByteUtils.onlyZerosOrMaxValuesInArray(values);
             while (validRow) {
-                attributeFusions.add(BemAttributeFusions.BemAttributeFusionEntry.builder()
+                attributeFusions.add(AttributeFusions.AttributeFusionEntry.builder()
                         .characterIndex(values[0])
                         .attribute3Fusion(values[1])
                         .attribute2Fusion(values[2])
@@ -29,7 +29,7 @@ public class BemFusionReader {
                 values = getAttributeRowValues(relativeInputStream);
                 validRow = !ByteUtils.onlyZerosOrMaxValuesInArray(values);
             }
-            return BemAttributeFusions.builder().entries(attributeFusions).build();
+            return AttributeFusions.builder().entries(attributeFusions).build();
         } catch (IOException ioe) {
             throw new UncheckedIOException(ioe);
         }
@@ -52,8 +52,8 @@ public class BemFusionReader {
                                 .fromCharacterIndex(values[1])
                                 .toBemId(values[2])
                                 .toCharacterIndex(values[3])
-                                .backupBemId(values[4])
-                                .backupCharacterId(values[5])
+                                .backupDimId(values[4])
+                                .backupCharacterIndex(values[5])
                                 .build());
                 values = getSpecificFusionRowValues(relativeInputStream);
                 validRow = !ByteUtils.onlyZerosOrMaxValuesInArray(values);

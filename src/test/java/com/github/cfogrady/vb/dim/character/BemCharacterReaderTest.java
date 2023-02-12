@@ -58,7 +58,7 @@ public class BemCharacterReaderTest {
                             .type(random.nextInt(5))
                             .smallAttackId(random.nextInt(39))
                             .bigAttackId(random.nextInt(21))
-                            .bp(random.nextInt(10000))
+                            .dp(random.nextInt(10000))
                             .hp(random.nextInt(10000))
                             .ap(random.nextInt(10000))
                             .firstPoolBattleChance(random.nextInt(100))

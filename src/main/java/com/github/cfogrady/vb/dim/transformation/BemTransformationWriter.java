@@ -17,7 +17,7 @@ public class BemTransformationWriter {
                 relativeOutputStream.write16BitInt(entry.getFromCharacterIndex());
                 relativeOutputStream.write16BitInt(entry.getMinutesUntilTransformation());
                 relativeOutputStream.write16BitInt(entry.getRequiredVitalValues());
-                relativeOutputStream.write16BitInt(entry.getRequiredPp());
+                relativeOutputStream.write16BitInt(entry.getRequiredTrophies());
                 relativeOutputStream.write16BitInt(entry.getRequiredBattles());
                 relativeOutputStream.write16BitInt(entry.getRequiredWinRatio());
                 relativeOutputStream.write16BitInt(entry.getMinimumMinuteOfHour());

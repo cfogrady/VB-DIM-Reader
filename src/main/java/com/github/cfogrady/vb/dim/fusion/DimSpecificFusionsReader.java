@@ -7,18 +7,18 @@ import java.util.List;
 
 public class DimSpecificFusionsReader {
     public static DimSpecificFusions dimSpecificFusionsFromBytes(byte[] bytes) {
-        List<DimSpecificFusions.DimSpecificFusionBlock> dimSpecificFusionBlocks = new ArrayList<>(DimSpecificFusions.VB_TABLE_SIZE);
+        List<SpecificFusions.SpecificFusionEntry> dimSpecificFusionBlocks = new ArrayList<>(DimSpecificFusions.VB_TABLE_SIZE);
         int[] values = ByteUtils.getUnsigned16Bit(bytes);
         int index = 0;
         boolean onlyZeroRow = ByteUtils.onlyZerosInRange(values, index, 4);
         int dummyRows = 0;
         while(!onlyZeroRow) {
             if (!ByteUtils.onlyZerosOrMaxValuesInRange(values, index, 4)) {
-                DimSpecificFusions.DimSpecificFusionBlock block = DimSpecificFusions.DimSpecificFusionBlock.builder()
-                        .statsIndex(values[index])
-                        .statsIndexForFusionResult(values[index+1])
-                        .fusionDimId(values[index+2])
-                        .fusionDimSlotId(values[index+3])
+                SpecificFusions.SpecificFusionEntry block = SpecificFusions.SpecificFusionEntry.builder()
+                        .fromCharacterIndex(values[index])
+                        .toCharacterIndex(values[index+1])
+                        .backupDimId(values[index+2])
+                        .backupCharacterIndex(values[index+3])
                         .build();
                 dimSpecificFusionBlocks.add(block);
             } else {
@@ -27,6 +27,6 @@ public class DimSpecificFusionsReader {
             index += 4;
             onlyZeroRow = ByteUtils.onlyZerosInRange(values, index, 4); //find out if the next row is only zeros
         }
-        return DimSpecificFusions.builder().dimSpecificFusionBlocks(dimSpecificFusionBlocks).dummyRows(dummyRows).build();
+        return DimSpecificFusions.builder().entries(dimSpecificFusionBlocks).dummyRows(dummyRows).build();
     }
 }

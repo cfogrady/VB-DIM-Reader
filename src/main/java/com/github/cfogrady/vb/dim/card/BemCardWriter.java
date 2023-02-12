@@ -43,24 +43,24 @@ public class BemCardWriter {
         DIMChecksumBuilder checksumBuilder = new DIMChecksumBuilder();
         OutputStreamWithNot outputStreamWithNot = OutputStreamWithNot.wrap(outputStream, checksumBuilder);
         try {
-            bemHeaderWriter.writeHeader(bemCard.getBemHeader(), outputStreamWithNot);
+            bemHeaderWriter.writeHeader(bemCard.getHeader(), outputStreamWithNot);
             outputStreamWithNot.writeZerosUntilOffset(0x10000);
             outputStreamWithNot.write16BitValueUntilOffset(BemCardConstants.NONE_VALUE, 0x20000);
             outputStreamWithNot.writeZerosUntilOffset(BemCardConstants.CHARACTER_SECTION_START);
-            bemCharacterWriter.writeBemCharacters(bemCard.getBemCharacterStats(), outputStreamWithNot);
+            bemCharacterWriter.writeBemCharacters(bemCard.getCharacterStats(), outputStreamWithNot);
             outputStreamWithNot.writeZerosUntilOffset(BemCardConstants.TRANSFORMATION_SECTION_START);
-            bemTransformationWriter.writeBemTransformations(bemCard.getBemTransformationRequirements(), outputStreamWithNot);
+            bemTransformationWriter.writeBemTransformations(bemCard.getTransformationRequirements(), outputStreamWithNot);
             outputStreamWithNot.writeZerosUntilOffset(BemCardConstants.ADVENTURE_SECTION_START);
-            bemAdventureWriter.writeAdventures(bemCard.getBemAdventureLevels(), outputStreamWithNot);
+            bemAdventureWriter.writeAdventures(bemCard.getAdventureLevels(), outputStreamWithNot);
             outputStreamWithNot.writeZerosUntilOffset(BemCardConstants.SPRITE_DIMENSIONS_START);
             bemSpriteWriter.writeSpriteDimensions(bemCard.getSpriteData(), outputStreamWithNot);
             outputStreamWithNot.writeZerosUntilOffset(BemCardConstants.ATTRIBUTE_FUSION_START);
-            bemFusionWriter.writeAttributeFusions(bemCard.getBemAttributeFusions(), outputStreamWithNot);
+            bemFusionWriter.writeAttributeFusions(bemCard.getAttributeFusions(), outputStreamWithNot);
             outputStreamWithNot.writeZerosUntilOffset(BemCardConstants.SPECIFIC_FUSION_START);
-            bemFusionWriter.writeSpecificFusions(bemCard.getBemSpecificFusions(), outputStreamWithNot);
+            bemFusionWriter.writeSpecificFusions(bemCard.getSpecificFusions(), outputStreamWithNot);
             outputStreamWithNot.writeZerosUntilOffset(0x90000);
             outputStreamWithNot.write16BitValueUntilOffset(BemCardConstants.NONE_VALUE, BemCardConstants.SPRITE_PACKAGE_START);
-            bemSpriteWriter.writeSpritePackage(bemCard.getSpriteData(), bemCard.getBemHeader().hasSpriteSignature(), outputStreamWithNot);
+            bemSpriteWriter.writeSpritePackage(bemCard.getSpriteData(), bemCard.getHeader().hasSpriteSignature(), outputStreamWithNot);
             outputStreamWithNot.writeZerosUntilOffset(BemCardConstants.CHECKSUM_LOCATION);
             outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(outputStreamWithNot.getChecksum()));
         } catch (IOException e) {

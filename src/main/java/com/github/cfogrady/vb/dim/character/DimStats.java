@@ -1,34 +1,24 @@
 package com.github.cfogrady.vb.dim.character;
 
-import java.util.List;
-
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder(toBuilder = true)
-public class DimStats {
+@SuperBuilder(toBuilder = true)
+@EqualsAndHashCode(callSuper = true)
+public class DimStats extends CharacterStats<DimStats.DimStatBlock> {
 
 	public static final int VB_TABLE_SIZE = 17;
 
 	@Data
-	@Builder(toBuilder = true)
-	public static class DimStatBlock {
-		private final int stage;
+	@SuperBuilder(toBuilder = true)
+	@EqualsAndHashCode(callSuper = true)
+	public static class DimStatBlock extends CharacterStats.CharacterStatsEntry {
 		private final boolean unlockRequired;
-		private final int attribute;
-		private final int disposition;
-		private final int smallAttackId;
-		private final int bigAttackId;
 		private final int dpStars;
-		private final int dp;
-		private final int hp;
-		private final int ap;
-		private final int firstPoolBattleChance;
-		private final int secondPoolBattleChance;
 	}
-	
-	private final List<DimStatBlock> statBlocks;
+
 	private final int dummyRows;
 
 }

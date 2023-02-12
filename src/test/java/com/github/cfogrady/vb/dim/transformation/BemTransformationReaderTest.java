@@ -37,7 +37,7 @@ public class BemTransformationReaderTest {
             Assertions.assertEquals(expected.getFromCharacterIndex(), read.getFromCharacterIndex());
             Assertions.assertEquals(expected.getMinutesUntilTransformation(), read.getMinutesUntilTransformation());
             Assertions.assertEquals(expected.getRequiredVitalValues(), read.getRequiredVitalValues());
-            Assertions.assertEquals(expected.getRequiredPp(), read.getRequiredPp());
+            Assertions.assertEquals(expected.getRequiredTrophies(), read.getRequiredTrophies());
             Assertions.assertEquals(expected.getRequiredBattles(), read.getRequiredBattles());
             Assertions.assertEquals(expected.getRequiredWinRatio(), read.getRequiredWinRatio());
             Assertions.assertEquals(expected.getMinimumMinuteOfHour(), read.getMinimumMinuteOfHour());
@@ -55,7 +55,7 @@ public class BemTransformationReaderTest {
                     .fromCharacterIndex(random.nextInt(23))
                     .minutesUntilTransformation(random.nextInt(1441))
                     .requiredVitalValues(random.nextInt(4501))
-                    .requiredPp(random.nextInt(21))
+                    .requiredTrophies(random.nextInt(21))
                     .requiredBattles(random.nextInt(21))
                     .requiredWinRatio(random.nextInt(76))
                     .minimumMinuteOfHour(random.nextInt(30))

@@ -10,18 +10,18 @@ public class EvolutionsWriter {
     public static void writeEvolutions(DimEvolutionRequirements evolutionRequirements, OutputStreamWithNot outputStreamWithNot) throws IOException {
         outputStreamWithNot.writeZerosUntilOffset(0x40000);
         int currentIndex = 0;
-        for(DimEvolutionRequirements.DimEvolutionRequirementBlock evolutionRequirementEntry : evolutionRequirements.getEvolutionRequirementBlocks()) {
-            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(evolutionRequirementEntry.getEvolveFromStatIndex()));
+        for(DimEvolutionRequirements.DimEvolutionRequirementBlock evolutionRequirementEntry : evolutionRequirements.getTransformationEntries()) {
+            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(evolutionRequirementEntry.getFromCharacterIndex()));
             outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(evolutionRequirementEntry.getHoursUntilEvolution()));
-            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(evolutionRequirementEntry.getVitalRequirements()));
+            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(evolutionRequirementEntry.getRequiredVitalValues()));
             outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(DimWriter.NONE_VALUE));
-            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(evolutionRequirementEntry.getTrophyRequirement()));
+            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(evolutionRequirementEntry.getRequiredTrophies()));
             outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(DimWriter.NONE_VALUE));
-            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(evolutionRequirementEntry.getBattleRequirement()));
+            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(evolutionRequirementEntry.getRequiredBattles()));
             outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(DimWriter.NONE_VALUE));
-            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(evolutionRequirementEntry.getWinRatioRequirement()));
+            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(evolutionRequirementEntry.getRequiredWinRatio()));
             outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(DimWriter.NONE_VALUE));
-            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(evolutionRequirementEntry.getEvolveToStatIndex()));
+            outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(evolutionRequirementEntry.getToCharacterIndex()));
             outputStreamWithNot.writeBytes(ByteUtils.convert16BitIntToBytes(DimWriter.NONE_VALUE));
             currentIndex++;
         }
