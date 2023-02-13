@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 
 @Data
 @SuperBuilder(toBuilder = true)
-public abstract class Card<
+public class Card<
         HeaderType extends DimHeader,
         CharacterStatsType extends CharacterStats,
         TransformationType extends TransformationRequirements,
