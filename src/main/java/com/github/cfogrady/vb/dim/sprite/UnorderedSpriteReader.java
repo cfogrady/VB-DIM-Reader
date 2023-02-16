@@ -17,6 +17,8 @@ import static com.github.cfogrady.vb.dim.sprite.SpriteWriter.NUMBER_OF_SPRITES_L
 @Slf4j
 @RequiredArgsConstructor
 public class UnorderedSpriteReader {
+    private final static byte[] ONE_BY_ONE = {0x0, 0x0};
+
     private final SpriteChecksumAreasCalculator spriteChecksumAreasCalculator;
 
 
@@ -35,18 +37,29 @@ public class UnorderedSpriteReader {
         }
         pointersWithSpriteIndices.sort(Comparator.comparing(PointerWithSpriteIndex::getPointer));
         List<SpriteWithIndex> spritesWithIndices = new ArrayList<>(numberOfSprites);
-        for(PointerWithSpriteIndex pointerWithSpriteIndex : pointersWithSpriteIndices) {
+        for(int i = 0; i < pointersWithSpriteIndices.size(); i++) {
+            PointerWithSpriteIndex pointerWithSpriteIndex = pointersWithSpriteIndices.get(i);
             int offset = pointerWithSpriteIndex.getPointer();
             spriteDataSection.readToOffset(offset);
             SpriteData.SpriteDimensions dimensions = spriteDimensions.get(pointerWithSpriteIndex.getIndex());
             int width = dimensions.getWidth();
             int height = dimensions.getHeight();
             int expectedSize = width * height * 2;
-            SpriteData.Sprite sprite = SpriteData.Sprite.builder()
-                    .width(width)
-                    .height(height)
-                    .pixelData(spriteDataSection.readNBytes(expectedSize))
-                    .build();
+            SpriteData.Sprite sprite;
+            if(wouldOverlapWithNextSprite(i, pointersWithSpriteIndices, expectedSize)) {
+                log.warn("Sprite at index {} has dimensions that would overlap with the next sprite! This is not a valid sprite replacing with a blank 1x1.", i);
+                sprite = SpriteData.Sprite.builder()
+                        .width(1)
+                        .height(1)
+                        .pixelData(ONE_BY_ONE)
+                        .build();
+            } else {
+                sprite = SpriteData.Sprite.builder()
+                        .width(width)
+                        .height(height)
+                        .pixelData(spriteDataSection.readNBytes(expectedSize))
+                        .build();
+            }
             spritesWithIndices.add(new SpriteWithIndex(sprite, pointerWithSpriteIndex.getIndex()));
         }
         spriteDataSection.readToOffset(endSignalLocation+4);
@@ -68,5 +81,14 @@ public class UnorderedSpriteReader {
             pointersWithSpriteIndices.add(new PointerWithSpriteIndex(i, pointers[i]));
         }
         return pointersWithSpriteIndices;
+    }
+
+    private boolean wouldOverlapWithNextSprite(int index, List<PointerWithSpriteIndex> pointersWithSpriteIndices, int expectedSize) {
+        if(index + 1 < pointersWithSpriteIndices.size()) {
+            int spritePointer = pointersWithSpriteIndices.get(index).getPointer();
+            int nextSpritePointer = pointersWithSpriteIndices.get(index+1).getPointer();
+            return spritePointer + expectedSize > nextSpritePointer;
+        }
+        return false;
     }
 }
