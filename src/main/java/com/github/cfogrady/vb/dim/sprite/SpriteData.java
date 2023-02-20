@@ -81,6 +81,10 @@ public class SpriteData {
 			}
 			return bgra;
 		}
+
+		public SpriteDimensions getSpriteDimensions() {
+			return SpriteDimensions.builder().width(width).height(height).build();
+		}
 	}
 
 	private static int scaleTo24BitColor(int color, int fromBits) {
