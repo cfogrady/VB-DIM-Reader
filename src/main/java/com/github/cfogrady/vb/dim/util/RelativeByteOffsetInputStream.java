@@ -28,7 +28,7 @@ public class RelativeByteOffsetInputStream implements ByteOffsetInputStream {
         if(wrapsAnotherByteOffsetInputStream) {
             return byteOffsetInputStream.readNBytes(numberOfBytes);
         } else {
-            return inputStream.readNBytes(numberOfBytes);
+            return readNBytes(inputStream, numberOfBytes);
         }
     }
 

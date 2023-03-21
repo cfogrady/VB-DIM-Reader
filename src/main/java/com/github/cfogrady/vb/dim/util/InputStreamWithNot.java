@@ -15,7 +15,7 @@ public class InputStreamWithNot implements ByteOffsetInputStream {
     }
 
     public byte[] readNBytes(int n) throws IOException {
-        byte[] bytes = inputStream.readNBytes(n);
+        byte[] bytes = readNBytes(inputStream, n);
         bytes = ByteUtils.applyNotOperation(bytes);
         checksumBuilder.addBytes(bytes, location);
         location += n;
