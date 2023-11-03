@@ -20,8 +20,8 @@ public class DimHeaderReader {
             log.error("Reader only handles data DIMs");
             throw new IllegalArgumentException("Reader only handles data DIMs");
         }
-        if(values[0x32/2] != values[0x34/2]) {
-            log.warn("Presumed DIM Ids {} and {} do not match! Please make an issue with the DIM card in question on https://github.com/cfogrady/DIM-Modifier/issues so I purchase and analyze the card", values[0x32/2], values[0x34/2]);
+        if((values[0x32/2] & 0xFF) != values[0x34/2]) {
+            log.warn("Masked DIM Id {} doesn't match check {}! Please make an issue with the DIM card in question on https://github.com/cfogrady/DIM-Modifier/issues so I purchase and analyze the card", values[0x32/2] & 0xFF, values[0x34/2]);
         }
         return builder
                 .text(new String(Arrays.copyOfRange(bytes, 0x10, 0x30)))
