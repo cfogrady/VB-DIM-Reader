@@ -2,6 +2,7 @@ package com.github.cfogrady.vb.dim.sprite;
 
 import com.github.cfogrady.vb.dim.util.ByteOffsetOutputStream;
 import com.github.cfogrady.vb.dim.util.ByteUtils;
+import com.github.cfogrady.vb.dim.util.RelativeByteOffsetOutputStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,7 +31,7 @@ public class SpriteWriter {
         }
     }
 
-    private void writeSpriteDataToMatchChecksum(ByteOffsetOutputStream outputStreamWithNot, SpriteData spriteData) throws IOException {
+    void writeSpriteDataToMatchChecksum(ByteOffsetOutputStream outputStreamWithNot, SpriteData spriteData) throws IOException {
         unorderedChecksumHacker.writeSpritesUnorderedToCorrectChecksums(spriteData, outputStreamWithNot);
     }
 
@@ -42,30 +43,31 @@ public class SpriteWriter {
         return offset;
     }
 
-    private static void writeUnmodified(SpriteData spriteData, ByteOffsetOutputStream outputStream) throws IOException {
-        outputStream.writeBytes(spriteData.getText().getBytes());
-        outputStream.writeZerosUntilOffset(TERMINATION_BYTES_OF_POINTER_TABLE + SPRITE_SECTION_START);
+    void writeUnmodified(SpriteData spriteData, ByteOffsetOutputStream outputStream) throws IOException {
+        RelativeByteOffsetOutputStream relativeOutputStream = new RelativeByteOffsetOutputStream(outputStream);
+        relativeOutputStream.writeBytes(spriteData.getText().getBytes());
+        relativeOutputStream.writeZerosUntilOffset(TERMINATION_BYTES_OF_POINTER_TABLE);
         //location of first offset sprite = int pointer for each sprite + int pointer for the termination bytes
         int firstSpritePointer = PIXEL_POINTER_TABLE_START + spriteData.getSprites().size() * 4 + 4;
         int terminationBytesPointer = calculateTerminationBytesLocation(firstSpritePointer, spriteData.getSprites());
-        outputStream.writeBytes(ByteUtils.convert32BitIntToBytes(terminationBytesPointer));
-        outputStream.writeZerosUntilOffset(TABLE_START + SPRITE_SECTION_START);
-        outputStream.writeBytes(ByteUtils.convert32BitIntToBytes(1)); // 0x40
+        relativeOutputStream.writeBytes(ByteUtils.convert32BitIntToBytes(terminationBytesPointer));
+        relativeOutputStream.writeZerosUntilOffset(TABLE_START);
+        relativeOutputStream.writeBytes(ByteUtils.convert32BitIntToBytes(1)); // 0x40
         //pointer to number of sprites
-        outputStream.writeBytes(ByteUtils.convert32BitIntToBytes(NUMBER_OF_SPRITES_LOCATION)); // 0x44
-        outputStream.writeBytes(ByteUtils.convert32BitIntToBytes(spriteData.getSprites().size())); // 0x48
+        relativeOutputStream.writeBytes(ByteUtils.convert32BitIntToBytes(NUMBER_OF_SPRITES_LOCATION)); // 0x44
+        relativeOutputStream.writeBytes(ByteUtils.convert32BitIntToBytes(spriteData.getSprites().size())); // 0x48
         // Pointer Table
         int currentSpritePointer = firstSpritePointer;
         for(SpriteData.Sprite sprite : spriteData.getSprites()) {
-            outputStream.writeBytes(ByteUtils.convert32BitIntToBytes(currentSpritePointer));
+            relativeOutputStream.writeBytes(ByteUtils.convert32BitIntToBytes(currentSpritePointer));
             currentSpritePointer = currentSpritePointer + sprite.getWidth() * sprite.getHeight() * 2;
         }
-        outputStream.writeBytes(ByteUtils.convert32BitIntToBytes(currentSpritePointer));
+        relativeOutputStream.writeBytes(ByteUtils.convert32BitIntToBytes(currentSpritePointer));
         // Pixel Data
         for(SpriteData.Sprite sprite : spriteData.getSprites()) {
-            outputStream.writeBytes(sprite.getPixelData());
+            relativeOutputStream.writeBytes(sprite.getPixelData());
         }
         // Termination bytes
-        outputStream.writeBytes(ByteUtils.convert32BitIntToBytes(TERMINATION_BYTES));
+        relativeOutputStream.writeBytes(ByteUtils.convert32BitIntToBytes(TERMINATION_BYTES));
     }
 }

@@ -39,6 +39,11 @@ public class SpriteChecksumAreasCalculator {
         return relativeLoc / chunkInterval;
     }
 
+    public int getChecksumStartLocation(int checksumIndex) {
+        int locationRelativeToStartOfSprites = checksumIndex * chunkInterval;
+        return locationRelativeToStartOfSprites + relativeChecksumStartLocation;
+    }
+
     public int nextChecksumStart(int relativeLocation) {
         if(beforeStart(relativeLocation)) {
             // before the start of the first
