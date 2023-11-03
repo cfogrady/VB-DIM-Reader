@@ -14,7 +14,7 @@ public class HeaderWriter {
         outputStream.writeBytes(headerData.getText().getBytes());
         outputStream.writeZerosUntilOffset(0x32);
         outputStream.writeBytes(ByteUtils.convert16BitIntToBytes(headerData.getDimId()));
-        outputStream.writeBytes(ByteUtils.convert16BitIntToBytes(headerData.getDimId()));
+        outputStream.writeBytes(ByteUtils.convert16BitIntToBytes(headerData.getDimId()&0xFF));
         outputStream.writeBytes(ByteUtils.convert16BitIntToBytes(headerData.getProductionYear()));
         outputStream.writeBytes(ByteUtils.convert16BitIntToBytes(headerData.getProductionMonth()));
         outputStream.writeBytes(ByteUtils.convert16BitIntToBytes(headerData.getProductionDay()));

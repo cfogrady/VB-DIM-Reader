@@ -16,7 +16,7 @@ public class BemHeaderWriter {
         relativeOutputStream.writeBytes(headerData.getText().getBytes());
         relativeOutputStream.writeZerosUntilOffset(0x32);
         relativeOutputStream.writeBytes(ByteUtils.convert16BitIntToBytes(headerData.getDimId()));
-        relativeOutputStream.writeBytes(ByteUtils.convert16BitIntToBytes(headerData.getDimId()));
+        relativeOutputStream.writeBytes(ByteUtils.convert16BitIntToBytes(headerData.getDimId()&0xFF));
         relativeOutputStream.writeBytes(ByteUtils.convert16BitIntToBytes(headerData.getProductionYear()));
         relativeOutputStream.writeBytes(ByteUtils.convert16BitIntToBytes(headerData.getProductionMonth()));
         relativeOutputStream.writeBytes(ByteUtils.convert16BitIntToBytes(headerData.getProductionDay()));
