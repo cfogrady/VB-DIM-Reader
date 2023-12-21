@@ -113,10 +113,30 @@ public class UnorderedSpriteChecksumHacker {
             currentSpot = spriteChecksumAreasCalculator.nextChecksumEnd(currentSpot);
             inMemoryOutputStream.writeZerosUntilOffset(currentSpot);
         }
+        currentSpot = fillRemainingChecksums(inMemoryOutputStream, currentSpot, spriteData);
         pointerTable[pointerTable.length-1] = currentSpot;
         inMemoryOutputStream.writeBytes(TERMINATION_SPRITE.getPixelData());
 
         return new PixelDataWithPointers(inMemoryOutputStream.getBytes(), pointerTable);
+    }
+
+    private int fillRemainingChecksums(InMemoryOutputStream inMemoryOutputStream, int currentSpot, SpriteData spriteData) throws IOException {
+        int lastChecksumStartLocation = spriteChecksumAreasCalculator.getChecksumStartLocation(spriteData.getSpriteChecksums().size()-1);
+        int nextChecksumStart = spriteChecksumAreasCalculator.nextChecksumStart(currentSpot);
+        int lastChecksumEnd = currentSpot;
+        while(nextChecksumStart <= lastChecksumStartLocation && nextChecksumStart < Integer.MAX_VALUE) {
+            // write zeros until the start of the area
+            inMemoryOutputStream.writeZerosUntilOffset(nextChecksumStart);
+            int checksum = spriteChecksumAreasCalculator.getChecksumForLocationFromList(nextChecksumStart, spriteData.getSpriteChecksums());
+            // write the checksum at the start of the area
+            inMemoryOutputStream.write16BitInt(checksum);
+            // write zeros until the end of the area
+            lastChecksumEnd = spriteChecksumAreasCalculator.nextChecksumEnd(nextChecksumStart);
+            inMemoryOutputStream.writeZerosUntilOffset(lastChecksumEnd);
+            // get the next checksums start and end
+            nextChecksumStart = spriteChecksumAreasCalculator.nextChecksumStart(lastChecksumEnd);
+        }
+        return lastChecksumEnd;
     }
 
     private int calculateAddressImmediatelyAfterTable(SpriteData spriteData) {
